@@ -2,6 +2,7 @@
 #define __STATE_HPP__
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "complex.hpp"
@@ -17,12 +18,10 @@ namespace qs {
 
     class Qubit {
     protected:
-        // helper function to join labels for tensor product of two qubits
-        static std::vector<BasicQubits> _tensor_labels(std::vector<BasicQubits> l1, std::vector<BasicQubits> l2);
         // helper function to compute tensor product of two vectors
         static std::vector<Complex> _tensor_vector(std::vector<Complex> v1, std::vector<Complex> v2);
 
-        Qubit(int dim, Complex coefficient, std::vector<Complex> items, std::vector<BasicQubits> labels) : dim(dim), coefficient(coefficient), items(items), labels(labels){};
+        Qubit(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : dim(dim), coefficient(coefficient), items(items), label(label){};
         // construct one of predefined qubits from BasicQubits enum
         Qubit(BasicQubits basis);
         // constructs qubit from binary representation for a number
@@ -35,7 +34,7 @@ namespace qs {
         Complex coefficient;
         std::vector<Complex> items;
         // symbol representation of the qubit
-        std::vector<BasicQubits> labels;
+        std::string label;
 
         // print qubit in symbol representation
         virtual void symbol(){};
@@ -45,7 +44,7 @@ namespace qs {
 
     class Ket : public Qubit {
     public:
-        Ket(int dim, Complex coefficient, std::vector<Complex> items, std::vector<BasicQubits> labels) : Qubit(dim, coefficient, items, labels){};
+        Ket(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
         Ket(BasicQubits basis) : Qubit(basis){};
         Ket(int x) : Qubit(x){};
 
@@ -58,7 +57,7 @@ namespace qs {
 
     class Bra : public Qubit {
     public:
-        Bra(int dim, Complex coefficient, std::vector<Complex> items, std::vector<BasicQubits> labels) : Qubit(dim, coefficient, items, labels){};
+        Bra(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
         Bra(BasicQubits basis) : Qubit(basis){};
         Bra(int x) : Qubit(x){};
 
