@@ -7,7 +7,7 @@ BUILD_DIR=./build
 CXXFLAGS=-std=c++11 -O2 -march=native
 
 # Find all the C++ files in src and test directories
-SRCS=$(SRC_DIR)/main.cpp $(SRC_DIR)/complex.cpp 
+SRCS=$(SRC_DIR)/main.cpp $(SRC_DIR)/complex.cpp $(SRC_DIR)/qubit.cpp
 
 # Create object file names by replacing .cpp with .o
 OBJS=$(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
