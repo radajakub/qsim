@@ -2,6 +2,7 @@
 #define __COMPLEX_HPP__
 
 #include <iostream>
+#include <sstream>
 
 namespace qs {
 
@@ -21,7 +22,7 @@ namespace qs {
 
         Complex conjugate();
 
-        friend std::ostream& operator<<(std::ostream& os, Complex const& complex);
+        std::string str();
     };
 };
 

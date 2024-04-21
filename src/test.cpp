@@ -2,20 +2,21 @@
 
 #include "complex.hpp"
 #include "qubit.hpp"
+#include "unitary.hpp"
 
 void test_complex() {
     qs::Complex a(1, 2);
     qs::Complex b(3, 4);
     qs::Complex c = a + b;
-    std::cout << c << std::endl;
+    std::cout << c.str() << std::endl;
     c = a - b;
-    std::cout << c << std::endl;
+    std::cout << c.str() << std::endl;
     c = a * b;
-    std::cout << c << std::endl;
+    std::cout << c.str() << std::endl;
     c += a;
-    std::cout << c << std::endl;
+    std::cout << c.str() << std::endl;
     c = c.conjugate();
-    std::cout << c << std::endl;
+    std::cout << c.str() << std::endl;
 }
 
 void test_qubits() {
@@ -44,6 +45,17 @@ void test_qubits() {
     std::cout << std::endl;
 }
 
+void test_unitary() {
+    qs::Hadamard h = qs::Hadamard();
+    h.symbol();
+    std::cout << " = " << std::endl;
+    h.matrix();
+    qs::Hadamard h_dagger = h.dagger();
+    h_dagger.symbol();
+    std::cout << " = " << std::endl;
+    h_dagger.matrix();
+}
+
 int main(int argc, char* argv[]) {
     std::cout << "Test Complex library" << std::endl;
     test_complex();
@@ -51,6 +63,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Test Qubits library" << std::endl;
     test_qubits();
+    std::cout << std::endl;
+
+    std::cout << "Test Unitary library" << std::endl;
+    test_unitary();
     std::cout << std::endl;
     return 0;
 }

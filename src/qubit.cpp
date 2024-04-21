@@ -47,12 +47,12 @@ void qs::Ket::symbol() {
 }
 
 void qs::Ket::vector() {
-    std::cout << this->coefficient << " * [";
+    std::cout << this->coefficient.str() << " * [";
     for (int i = 0; i < this->dim; ++i) {
         if (i != 0) {
             std::cout << ", ";
         }
-        std::cout << this->items[i];
+        std::cout << this->items[i].str();
     }
     std::cout << "]^T";
 }
@@ -69,12 +69,12 @@ void qs::Bra::symbol() {
 }
 
 void qs::Bra::vector() {
-    std::cout << this->coefficient << " * [";
+    std::cout << this->coefficient.str() << " * [";
     for (int i = 0; i < this->dim; ++i) {
         if (i != 0) {
             std::cout << ", ";
         }
-        std::cout << this->items[i];
+        std::cout << this->items[i].str();
     }
     std::cout << "]";
 }

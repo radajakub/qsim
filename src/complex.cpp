@@ -22,12 +22,13 @@ qs::Complex qs::Complex::conjugate() {
     return qs::Complex(this->Re, -this->Im);
 }
 
-std::ostream& qs::operator<<(std::ostream& os, qs::Complex const& complex) {
-    os << complex.Re;
-    if (complex.Im > 0) {
-        os << "+" << complex.Im << "i";
-    } else if (complex.Im < 0) {
-        os << "-" << -complex.Im << "i";
+std::string qs::Complex::str() {
+    std::stringstream ss;
+    ss << this->Re;
+    if (this->Im > 0) {
+        ss << "+" << this->Im << "i";
+    } else if (this->Im < 0) {
+        ss << "-" << -this->Im << "i";
     }
-    return os;
+    return ss.str();
 }
