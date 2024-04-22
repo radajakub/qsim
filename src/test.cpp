@@ -46,11 +46,11 @@ void test_qubits() {
 }
 
 void test_unitary() {
-    qs::Hadamard h = qs::Hadamard();
+    qs::Unitary h = qs::Hadamard();
     h.symbol();
     std::cout << " = " << std::endl;
     h.matrix();
-    qs::Hadamard h_dagger = h.dagger();
+    qs::Unitary h_dagger = h.dagger();
     h_dagger.symbol();
     std::cout << " = " << std::endl;
     h_dagger.matrix();

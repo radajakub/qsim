@@ -12,10 +12,6 @@
 namespace qs {
 
     class Unitary {
-    protected:
-        static std::vector<std::vector<Complex>> _dagger_matrix(std::vector<std::vector<Complex>> &items);
-        static std::string _dagger_label(std::string &label);
-
     public:
         int dim;
         Complex coefficient;
@@ -26,8 +22,8 @@ namespace qs {
 
         Unitary dagger();
 
-        virtual void symbol(){};
-        virtual void matrix(){};
+        void symbol();
+        void matrix();
     };
 
     class Hadamard : public Unitary {
@@ -36,11 +32,6 @@ namespace qs {
 
     public:
         Hadamard() : Unitary(2, Complex(1 / sqrt(2)), {{Complex(1), Complex(1)}, {Complex(1), Complex(-1)}}, std::string("H")){};
-
-        Hadamard dagger();
-
-        void symbol() override;
-        void matrix() override;
     };
 
 };

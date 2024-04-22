@@ -1,33 +1,23 @@
 #include "unitary.hpp"
 
-std::vector<std::vector<qs::Complex>> qs::Unitary::_dagger_matrix(std::vector<std::vector<qs::Complex>> &items) {
-    int dim = items.size();
-    std::vector<std::vector<Complex>> daggered(dim, std::vector<Complex>(dim, Complex(0)));
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            daggered[j][i] = items[i][j].conjugate();
+qs::Unitary qs::Unitary::dagger() {
+    std::vector<std::vector<Complex>> daggered(this->dim, std::vector<Complex>(this->dim, Complex(0)));
+    for (int i = 0; i < this->dim; i++) {
+        for (int j = 0; j < this->dim; j++) {
+            daggered[j][i] = this->items[i][j].conjugate();
         }
     }
-    return daggered;
+
+    std::string new_label = "(" + label + ")^+";
+
+    return qs::Unitary(this->dim, this->coefficient.conjugate(), daggered, new_label);
 }
 
-std::string qs::Unitary::_dagger_label(std::string &label) {
-    return "(" + label + ")^+";
-}
-
-qs::Unitary qs::Unitary::dagger() {
-    return qs::Unitary(this->dim, this->coefficient.conjugate(), qs::Unitary::_dagger_matrix(this->items), qs::Unitary::_dagger_label(this->label));
-}
-
-qs::Hadamard qs::Hadamard::dagger() {
-    return qs::Hadamard(this->dim, this->coefficient.conjugate(), qs::Unitary::_dagger_matrix(this->items), qs::Unitary::_dagger_label(this->label));
-}
-
-void qs::Hadamard::symbol() {
+void qs::Unitary::symbol() {
     std::cout << this->label;
 }
 
-void qs::Hadamard::matrix() {
+void qs::Unitary::matrix() {
     size_t cell_size = 1;
     std::vector<std::vector<std::string>> numbers(this->dim, std::vector<std::string>(this->dim));
     for (int i = 0; i < this->dim; i++) {
