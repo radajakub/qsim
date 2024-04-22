@@ -23,6 +23,9 @@ namespace qs {
 
         Unitary dagger();
 
+        // perform tensor product for two unitary matrices
+        Unitary tensor(Unitary& other);
+
         Unitary operator+(Unitary& other);
         Unitary operator-(Unitary& other);
         Unitary operator*(Unitary& other);
@@ -35,6 +38,31 @@ namespace qs {
     class Hadamard : public Unitary {
     public:
         Hadamard() : Unitary(2, Complex(1 / sqrt(2)), {{Complex(1), Complex(1)}, {Complex(1), Complex(-1)}}, std::string("H")){};
+    };
+
+    class Identity : public Unitary {
+    public:
+        Identity() : Unitary(2, {{Complex(1), Complex(0)}, {Complex(0), Complex(1)}}, std::string("I")) {}
+    };
+
+    class PauliX : public Unitary {
+    public:
+        PauliX() : Unitary(2, {{Complex(0), Complex(1)}, {Complex(1), Complex(0)}}, std::string("X")) {}
+    };
+
+    class PauliY : public Unitary {
+    public:
+        PauliY() : Unitary(2, {{Complex(0), Complex(0, -1)}, {Complex(0, 1), Complex(0)}}, std::string("Y")) {}
+    };
+
+    class PauliZ : public Unitary {
+    public:
+        PauliZ() : Unitary(2, {{Complex(1), Complex(0)}, {Complex(0), Complex(-1)}}, std::string("Z")) {}
+    };
+
+    class CNOT : public Unitary {
+    public:
+        CNOT() : Unitary(4, {{Complex(1), Complex(0), Complex(0), Complex(0)}, {Complex(0), Complex(1), Complex(0), Complex(0)}, {Complex(0), Complex(0), Complex(0), Complex(1)}, {Complex(0), Complex(0), Complex(1), Complex(0)}}, std::string("CX")) {}
     };
 
 };

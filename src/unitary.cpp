@@ -27,6 +27,33 @@ qs::Unitary qs::Unitary::dagger() {
     return qs::Unitary(this->dim, daggered, new_label);
 }
 
+qs::Unitary qs::Unitary::tensor(qs::Unitary &other) {
+    int new_dim = this->dim * other.dim;
+    std::vector<std::vector<Complex>> result(new_dim, std::vector<Complex>(new_dim));
+
+    int row_offset;
+    int col_offset;
+    int row;
+    int col;
+    for (int r1 = 0; r1 < this->dim; ++r1) {
+        row_offset = r1 * other.dim;
+        for (int c1 = 0; c1 < this->dim; ++c1) {
+            col_offset = c1 * other.dim;
+            for (int r2 = 0; r2 < this->dim; ++r2) {
+                row = row_offset + r2;
+                for (int c2 = 0; c2 < this->dim; ++c2) {
+                    col = col_offset + c2;
+                    result[row][col] = this->items[r1][c1] * other.items[r2][c2];
+                }
+            }
+        }
+    }
+
+    std::string new_label = this->label + " ⊗ " + other.label;
+
+    return qs::Unitary(this->dim * other.dim, result, new_label);
+}
+
 qs::Unitary qs::Unitary::operator+(qs::Unitary &other) {
     if (this->dim != other.dim) {
         throw std::invalid_argument("+: Dimension Mismatch");
