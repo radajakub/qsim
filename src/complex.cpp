@@ -18,6 +18,18 @@ qs::Complex& qs::Complex::operator+=(qs::Complex& other) {
     return *this;
 }
 
+qs::Complex& qs::Complex::operator-=(qs::Complex& other) {
+    this->Re -= other.Re;
+    this->Im -= other.Im;
+    return *this;
+}
+
+qs::Complex& qs::Complex::operator*=(qs::Complex& other) {
+    this->Re = this->Re * other.Re - this->Im * other.Im;
+    this->Im = this->Re * other.Im + this->Im * other.Re;
+    return *this;
+}
+
 qs::Complex qs::Complex::conjugate() {
     return qs::Complex(this->Re, -this->Im);
 }

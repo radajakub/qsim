@@ -21,17 +21,17 @@ namespace qs {
         // helper function to compute tensor product of two vectors
         static std::vector<Complex> _tensor_vector(std::vector<Complex> v1, std::vector<Complex> v2);
 
-        Qubit(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : dim(dim), coefficient(coefficient), items(items), label(label){};
+        // construct full Qubit
+        Qubit(int dim, Complex coefficient, std::vector<Complex> items, std::string label);
+        // construct Qubit with implicit coefficient being 1
+        Qubit(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, Complex(1), items, label){};
         // construct one of predefined qubits from BasicQubits enum
         Qubit(BasicQubits basis);
-        // constructs qubit from binary representation for a number
-        Qubit(int x);
 
     public:
         // dimension of the qubit, should always be 2^n
         int dim;
         // vector representation of the qubit
-        Complex coefficient;
         std::vector<Complex> items;
         // symbol representation of the qubit
         std::string label;
@@ -45,8 +45,8 @@ namespace qs {
     class Ket : public Qubit {
     public:
         Ket(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
+        Ket(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
         Ket(BasicQubits basis) : Qubit(basis){};
-        Ket(int x) : Qubit(x){};
 
         void symbol() override;
         void vector() override;
@@ -58,8 +58,8 @@ namespace qs {
     class Bra : public Qubit {
     public:
         Bra(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
+        Bra(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
         Bra(BasicQubits basis) : Qubit(basis){};
-        Bra(int x) : Qubit(x){};
 
         void symbol() override;
         void vector() override;

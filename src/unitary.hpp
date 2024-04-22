@@ -8,28 +8,31 @@
 #include <vector>
 
 #include "complex.hpp"
+#include "qubit.hpp"
 
 namespace qs {
 
     class Unitary {
     public:
         int dim;
-        Complex coefficient;
         std::vector<std::vector<Complex>> items;
         std::string label;
 
-        Unitary(int dim, Complex coefficient, std::vector<std::vector<Complex>> items, std::string label) : dim(dim), coefficient(coefficient), items(items), label(label){};
+        Unitary(int dim, Complex coefficient, std::vector<std::vector<Complex>> items, std::string label);
+        Unitary(int dim, std::vector<std::vector<Complex>> items, std::string label) : Unitary(dim, Complex(1), items, label){};
 
         Unitary dagger();
+
+        Unitary operator+(Unitary& other);
+        Unitary operator-(Unitary& other);
+        Unitary operator*(Unitary& other);
+        Ket operator*(Ket& other);
 
         void symbol();
         void matrix();
     };
 
     class Hadamard : public Unitary {
-    protected:
-        Hadamard(int dim, Complex coefficient, std::vector<std::vector<Complex>> items, std::string label) : Unitary(dim, coefficient, items, label){};
-
     public:
         Hadamard() : Unitary(2, Complex(1 / sqrt(2)), {{Complex(1), Complex(1)}, {Complex(1), Complex(-1)}}, std::string("H")){};
     };

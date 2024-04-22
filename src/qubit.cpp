@@ -1,32 +1,42 @@
 #include "qubit.hpp"
 
+qs::Qubit::Qubit(int dim, qs::Complex coefficient, std::vector<qs::Complex> items, std::string label) {
+    this->dim = dim;
+    this->label = label;
+    this->items = items;
+    for (Complex &item : this->items) {
+        item *= coefficient;
+    }
+}
+
 qs::Qubit::Qubit(qs::BasicQubits basis) {
-    this->dim = 2;
-    this->coefficient = qs::Complex(1);
-    this->items = std::vector<Complex>(2);
-    std::string label(1, static_cast<char>(basis));
-    this->label = std::string(label);
+    dim = 2;
+    this->items = std::vector<qs::Complex>(2);
+    this->label = std::string(1, static_cast<char>(basis));
+    qs::Complex coefficient(1);
     switch (basis) {
     case qs::BasicQubits::ZERO:
-        this->items[0] = qs::Complex(1);
+        items[0] = qs::Complex(1);
         break;
     case qs::BasicQubits::ONE:
-        this->items[1] = qs::Complex(1);
+        items[1] = qs::Complex(1);
         break;
     case qs::BasicQubits::PLUS:
-        this->coefficient = Complex(1 / sqrt(2));
-        this->items[0] = Complex(1);
-        this->items[1] = Complex(1);
+        coefficient = qs::Complex(1 / sqrt(2));
+        items[0] = qs::Complex(1);
+        items[1] = qs::Complex(1);
         break;
     case qs::BasicQubits::MINUS:
-        this->coefficient = Complex(1 / sqrt(2));
-        this->items[0] = Complex(1);
-        this->items[1] = Complex(-1);
+        coefficient = qs::Complex(1 / sqrt(2));
+        items[0] = qs::Complex(1);
+        items[1] = qs::Complex(-1);
         break;
     default:
         std::cout << "Unsupported basis" << std::endl;
         exit(1);
     }
+    this->items[0] *= coefficient;
+    this->items[1] *= coefficient;
 }
 
 std::vector<qs::Complex> qs::Qubit::_tensor_vector(std::vector<qs::Complex> v1, std::vector<qs::Complex> v2) {
@@ -47,7 +57,7 @@ void qs::Ket::symbol() {
 }
 
 void qs::Ket::vector() {
-    std::cout << this->coefficient.str() << " * [";
+    std::cout << "[";
     for (int i = 0; i < this->dim; ++i) {
         if (i != 0) {
             std::cout << ", ";
@@ -61,7 +71,7 @@ qs::Ket qs::Ket::tensor(Ket &other) {
     int new_dim = this->dim * other.dim;
     std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
     std::string new_label = this->label + other.label;
-    return qs::Ket(new_dim, this->coefficient * other.coefficient, new_items, new_label);
+    return qs::Ket(new_dim, new_items, new_label);
 }
 
 void qs::Bra::symbol() {
@@ -69,7 +79,7 @@ void qs::Bra::symbol() {
 }
 
 void qs::Bra::vector() {
-    std::cout << this->coefficient.str() << " * [";
+    std::cout << "[";
     for (int i = 0; i < this->dim; ++i) {
         if (i != 0) {
             std::cout << ", ";
@@ -83,7 +93,7 @@ qs::Bra qs::Bra::tensor(Bra &other) {
     int new_dim = this->dim * other.dim;
     std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
     std::string new_label = this->label + other.label;
-    return qs::Bra(new_dim, this->coefficient * other.coefficient, new_items, new_label);
+    return qs::Bra(new_dim, new_items, new_label);
 }
 
 qs::Complex qs::dot(Bra &bra, Ket &ket) {
@@ -97,5 +107,5 @@ qs::Complex qs::dot(Bra &bra, Ket &ket) {
         qs::Complex item = bra.items[i] * ket.items[i];
         result += item;
     }
-    return bra.coefficient * ket.coefficient * result;
+    return result;
 }

@@ -19,6 +19,8 @@ namespace qs {
         Complex operator-(Complex& other);
         Complex operator*(Complex& other);
         Complex& operator+=(Complex& other);
+        Complex& operator-=(Complex& other);
+        Complex& operator*=(Complex& other);
 
         Complex conjugate();
 

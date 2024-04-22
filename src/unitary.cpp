@@ -1,16 +1,102 @@
 #include "unitary.hpp"
 
+qs::Unitary::Unitary(int dim, Complex coefficient, std::vector<std::vector<Complex>> items, std::string label) {
+    this->dim = dim;
+    this->items = items;
+    this->label = label;
+    // multiply only if the coefficient is not 1
+    if (coefficient.Re != 1 || coefficient.Im != 0) {
+        for (std::vector<Complex> &row : this->items) {
+            for (Complex &item : row) {
+                item *= coefficient;
+            }
+        }
+    }
+}
+
 qs::Unitary qs::Unitary::dagger() {
     std::vector<std::vector<Complex>> daggered(this->dim, std::vector<Complex>(this->dim, Complex(0)));
     for (int i = 0; i < this->dim; i++) {
         for (int j = 0; j < this->dim; j++) {
-            daggered[j][i] = this->items[i][j].conjugate();
+            daggered[i][j] = this->items[j][i].conjugate();
         }
     }
 
     std::string new_label = "(" + label + ")^+";
 
-    return qs::Unitary(this->dim, this->coefficient.conjugate(), daggered, new_label);
+    return qs::Unitary(this->dim, daggered, new_label);
+}
+
+qs::Unitary qs::Unitary::operator+(qs::Unitary &other) {
+    if (this->dim != other.dim) {
+        throw std::invalid_argument("+: Dimension Mismatch");
+    }
+
+    std::vector<std::vector<Complex>> result(this->items);
+    for (int i = 0; i < this->dim; i++) {
+        for (int j = 0; j < this->dim; j++) {
+            result[i][j] += other.items[i][j];
+        }
+    }
+
+    std::string new_label = "(" + this->label + " + " + other.label + ")";
+
+    return qs::Unitary(this->dim, result, new_label);
+}
+
+qs::Unitary qs::Unitary::operator-(qs::Unitary &other) {
+    if (this->dim != other.dim) {
+        throw std::invalid_argument("-: Dimension Mismatch");
+    }
+
+    std::vector<std::vector<Complex>> result(this->items);
+    for (int i = 0; i < this->dim; i++) {
+        for (int j = 0; j < this->dim; j++) {
+            result[i][j] -= other.items[i][j];
+        }
+    }
+
+    std::string new_label = "(" + this->label + " - " + other.label + ")";
+
+    return qs::Unitary(this->dim, result, new_label);
+}
+
+qs::Unitary qs::Unitary::operator*(qs::Unitary &other) {
+    if (this->dim != other.dim) {
+        throw std::invalid_argument("*: Dimension Mismatch");
+    }
+
+    std::vector<std::vector<qs::Complex>> result(this->dim, std::vector<Complex>(this->dim));
+    for (int r = 0; r < this->dim; ++r) {
+        for (int c = 0; c < this->dim; ++c) {
+            for (int i = 0; i < this->dim; ++i) {
+                qs::Complex subres = this->items[r][i] * other.items[i][c];
+                result[r][c] += subres;
+            }
+        }
+    }
+
+    std::string new_label = this->label + other.label;
+
+    return qs::Unitary(this->dim, result, new_label);
+}
+
+qs::Ket qs::Unitary::operator*(qs::Ket &other) {
+    if (this->dim != other.dim) {
+        throw std::invalid_argument("*: Dimension Mismatch");
+    }
+
+    std::vector<qs::Complex> result(this->dim);
+    for (int i = 0; i < this->dim; i++) {
+        for (int j = 0; j < this->dim; j++) {
+            qs::Complex subres = this->items[i][j] * other.items[j];
+            result[i] += subres;
+        }
+    }
+
+    std::string new_label = this->label + other.label;
+
+    return qs::Ket(this->dim, result, label);
 }
 
 void qs::Unitary::symbol() {
@@ -27,14 +113,7 @@ void qs::Unitary::matrix() {
         }
     }
 
-    std::string coefficient_str = this->coefficient.str();
-    std::cout << coefficient_str << " * ";
-    size_t padding = coefficient_str.length() + 3;
-
     for (int r = 0; r < this->dim; r++) {
-        if (r != 0) {
-            std::cout << std::string(padding, ' ');
-        }
         std::cout << "[";
         for (int c = 0; c < this->dim; c++) {
             if (c != 0) {

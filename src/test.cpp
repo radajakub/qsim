@@ -32,6 +32,18 @@ void test_qubits() {
     q1.vector();
     std::cout << std::endl;
 
+    qs::Ket q_minus(qs::BasicQubits::MINUS);
+    q_minus.symbol();
+    std::cout << " = ";
+    q_minus.vector();
+    std::cout << std::endl;
+
+    qs::Ket q_plus(qs::BasicQubits::PLUS);
+    q_plus.symbol();
+    std::cout << " = ";
+    q_plus.vector();
+    std::cout << std::endl;
+
     qs::Ket q01 = q0.tensor(q1);
     q01.symbol();
     std::cout << " = ";
@@ -50,10 +62,37 @@ void test_unitary() {
     h.symbol();
     std::cout << " = " << std::endl;
     h.matrix();
+
     qs::Unitary h_dagger = h.dagger();
     h_dagger.symbol();
     std::cout << " = " << std::endl;
     h_dagger.matrix();
+
+    qs::Unitary x = h + h_dagger;
+    x.symbol();
+    std::cout << " = " << std::endl;
+    x.matrix();
+
+    x = h - h_dagger;
+    x.symbol();
+    std::cout << " = " << std::endl;
+    x.matrix();
+
+    x = h * h_dagger;
+    x.symbol();
+    std::cout << " = " << std::endl;
+    x.matrix();
+
+    qs::Ket q0(qs::BasicQubits::ZERO);
+    q0.symbol();
+    std::cout << " = ";
+    q0.vector();
+    std::cout << std::endl;
+    qs::Ket q1 = h * q0;
+    q1.symbol();
+    std::cout << " = ";
+    q1.vector();
+    std::cout << std::endl;
 }
 
 int main(int argc, char* argv[]) {
