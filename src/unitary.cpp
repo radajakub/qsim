@@ -96,7 +96,7 @@ qs::Ket qs::Unitary::operator*(qs::Ket &other) {
 
     std::string new_label = this->label + other.label;
 
-    return qs::Ket(this->dim, result, label);
+    return qs::Ket(this->dim, result, new_label);
 }
 
 void qs::Unitary::symbol() {

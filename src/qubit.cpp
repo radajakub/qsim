@@ -9,10 +9,16 @@ qs::Qubit::Qubit(int dim, qs::Complex coefficient, std::vector<qs::Complex> item
     }
 }
 
-qs::Qubit::Qubit(qs::BasicQubits basis) {
+qs::Qubit::Qubit(qs::BasicQubits basis, bool ket) {
     dim = 2;
     this->items = std::vector<qs::Complex>(2);
-    this->label = std::string(1, static_cast<char>(basis));
+    std::string symbol(1, static_cast<char>(basis));
+    // this->label = this->add_brackets(symbol);
+    if (ket) {
+        this->label = "|" + symbol + ">";
+    } else {
+        this->label = "<" + symbol + "|";
+    }
     qs::Complex coefficient(1);
     switch (basis) {
     case qs::BasicQubits::ZERO:
@@ -52,8 +58,20 @@ std::vector<qs::Complex> qs::Qubit::_tensor_vector(std::vector<qs::Complex> v1, 
     return result;
 }
 
+std::string qs::Qubit::add_brackets(std::string label) {
+    return "|" + label + "|";
+}
+
+std::string qs::Qubit::strip_brackets() {
+    return this->label.substr(1, this->label.size() - 2);
+}
+
+std::string qs::Ket::add_brackets(std::string label) {
+    return "|" + label + ">";
+}
+
 void qs::Ket::symbol() {
-    std::cout << "|" << this->label << ">";
+    std::cout << this->label;
 }
 
 void qs::Ket::vector() {
@@ -70,12 +88,16 @@ void qs::Ket::vector() {
 qs::Ket qs::Ket::tensor(Ket &other) {
     int new_dim = this->dim * other.dim;
     std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
-    std::string new_label = this->label + other.label;
+    std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Ket(new_dim, new_items, new_label);
 }
 
+std::string qs::Bra::add_brackets(std::string label) {
+    return "<" + label + "|";
+}
+
 void qs::Bra::symbol() {
-    std::cout << "<" << this->label << "|";
+    std::cout << this->label;
 }
 
 void qs::Bra::vector() {
@@ -92,7 +114,7 @@ void qs::Bra::vector() {
 qs::Bra qs::Bra::tensor(Bra &other) {
     int new_dim = this->dim * other.dim;
     std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
-    std::string new_label = this->label + other.label;
+    std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Bra(new_dim, new_items, new_label);
 }
 

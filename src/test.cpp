@@ -84,10 +84,6 @@ void test_unitary() {
     x.matrix();
 
     qs::Ket q0(qs::BasicQubits::ZERO);
-    q0.symbol();
-    std::cout << " = ";
-    q0.vector();
-    std::cout << std::endl;
     qs::Ket q1 = h * q0;
     q1.symbol();
     std::cout << " = ";

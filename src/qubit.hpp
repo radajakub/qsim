@@ -26,7 +26,7 @@ namespace qs {
         // construct Qubit with implicit coefficient being 1
         Qubit(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, Complex(1), items, label){};
         // construct one of predefined qubits from BasicQubits enum
-        Qubit(BasicQubits basis);
+        Qubit(BasicQubits basis, bool ket);
 
     public:
         // dimension of the qubit, should always be 2^n
@@ -35,6 +35,10 @@ namespace qs {
         std::vector<Complex> items;
         // symbol representation of the qubit
         std::string label;
+
+        // manipulate label string
+        virtual std::string add_brackets(std::string label);
+        std::string strip_brackets();
 
         // print qubit in symbol representation
         virtual void symbol(){};
@@ -46,7 +50,9 @@ namespace qs {
     public:
         Ket(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
         Ket(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
-        Ket(BasicQubits basis) : Qubit(basis){};
+        Ket(BasicQubits basis) : Qubit(basis, true){};
+
+        std::string add_brackets(std::string label) override;
 
         void symbol() override;
         void vector() override;
@@ -59,8 +65,9 @@ namespace qs {
     public:
         Bra(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
         Bra(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
-        Bra(BasicQubits basis) : Qubit(basis){};
+        Bra(BasicQubits basis) : Qubit(basis, false){};
 
+        std::string add_brackets(std::string label) override;
         void symbol() override;
         void vector() override;
 
