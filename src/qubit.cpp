@@ -111,6 +111,24 @@ void qs::Bra::vector() {
     std::cout << "]";
 }
 
+qs::Bra qs::Bra::operator*(qs::Unitary &other) {
+    if (this->dim != other.dim) {
+        throw std::invalid_argument("*: Dimension Mismatch");
+    }
+
+    std::vector<qs::Complex> result(this->dim);
+    for (int i = 0; i < this->dim; i++) {
+        for (int j = 0; j < this->dim; j++) {
+            qs::Complex subres = this->items[j] * other.items[j][i];
+            result[i] += subres;
+        }
+    }
+
+    std::string new_label = this->label + other.label;
+
+    return qs::Bra(this->dim, result, new_label);
+}
+
 qs::Bra qs::Bra::tensor(Bra &other) {
     int new_dim = this->dim * other.dim;
     std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);

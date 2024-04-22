@@ -70,6 +70,17 @@ void test_qubits() {
 
     qs::Ket q110 = q1.tensor(q1).tensor(q0);
     print_qubit(q110);
+
+    qs::Bra b0(qs::BasicQubits::PLUS);
+    print_qubit(b0);
+    qs::Unitary H = qs::Hadamard();
+    print_unitary(H);
+
+    qs::Ket q = H * q0;
+    print_qubit(q);
+
+    qs::Bra b = b0 * H;
+    print_qubit(b);
 }
 
 void test_unitary() {

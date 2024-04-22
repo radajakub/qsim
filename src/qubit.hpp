@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "complex.hpp"
+#include "unitary.hpp"
 
 namespace qs {
 
@@ -15,6 +16,8 @@ namespace qs {
         PLUS = '+',
         MINUS = '-',
     };
+
+    class Unitary;
 
     class Qubit {
     protected:
@@ -70,6 +73,8 @@ namespace qs {
         std::string add_brackets(std::string label) override;
         void symbol() override;
         void vector() override;
+
+        Bra operator*(Unitary &other);
 
         // preform tensor product with other bra
         Bra tensor(Bra &other);

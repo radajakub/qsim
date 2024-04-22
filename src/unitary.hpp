@@ -12,6 +12,9 @@
 
 namespace qs {
 
+    class Bra;
+    class Ket;
+
     class Unitary {
     public:
         int dim;
