@@ -3,6 +3,7 @@
 #include "complex.hpp"
 #include "qubit.hpp"
 #include "unitary.hpp"
+#include "vec_op.hpp"
 
 void print_complex_operation(qs::Complex &a, qs::Complex &b, qs::Complex &res, std::string str) {
     std::cout << a.str() << " " << str << " " << b.str() << " = " << res.str() << std::endl;
@@ -43,6 +44,65 @@ void test_complex() {
     print_complex_operation(a, res, "conjugate");
 }
 
+void test_vec() {
+    qs::Complex res;
+    qs::c_vec vec_res;
+    qs::c_mat mat_res;
+
+    qs::c_vec a = {qs::Complex(1), qs::Complex(0)};
+    qs::c_vec b = {qs::Complex(0), qs::Complex(1)};
+    qs::c_vec x = {qs::Complex(0, 1), qs::Complex(1, -1)};
+    qs::Complex c = {qs::Complex(2)};
+
+    std::cout << "[1, 0] + [0, 1] = ";
+    vec_res = qs::_add(a, b);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "[1, 0] - [0, 1] = ";
+    vec_res = qs::_sub(a, b);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "[0, 1] - [1, 0] = ";
+    vec_res = qs::_sub(b, a);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "2 * [1, 0] = ";
+    vec_res = qs::_mul(c, a);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "conjugate([1, 0]) = ";
+    vec_res = qs::_conjugate(a);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "conjugate([0+1i, 1-1i]) = ";
+    vec_res = qs::_conjugate(x);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+
+    std::cout << "inner([1, 0], [0, 1]) = " << qs::_inner(a, b).str() << std::endl;
+    std::cout << "inner([0+1i, 1-1i], [0, 1]) = " << qs::_inner(x, b).str() << std::endl;
+
+    std::cout << "outer([1, 0], [0, 1]) = " << std::endl;
+    mat_res = qs::_outer(a, b);
+    qs::print_mat(mat_res);
+    std::cout << std::endl;
+
+    std::cout << "outer([1, 0], [1, 1]) = " << std::endl;
+    mat_res = qs::_outer(a, a);
+    qs::print_mat(mat_res);
+    std::cout << std::endl;
+
+    std::cout << "tensor([1, 0], [0, 1]) = ";
+    vec_res = qs::_tensor(a, b);
+    qs::print_vec(vec_res);
+    std::cout << std::endl;
+}
+
 void test_qubits() {
     qs::Ket q0(qs::BasicQubits::ZERO);
     print_qubit(q0);
@@ -56,19 +116,19 @@ void test_qubits() {
     qs::Ket q_plus(qs::BasicQubits::PLUS);
     print_qubit(q_plus);
 
-    qs::Ket q00 = q0.tensor(q0);
+    qs::Ket q00 = q0 * q0;
     print_qubit(q00);
 
-    qs::Ket q10 = q1.tensor(q0);
+    qs::Ket q10 = q1 * q0;
     print_qubit(q10);
 
-    qs::Ket q01 = q0.tensor(q1);
+    qs::Ket q01 = q0 * q1;
     print_qubit(q01);
 
-    qs::Ket q11 = q1.tensor(q1);
+    qs::Ket q11 = q1 * q1;
     print_qubit(q11);
 
-    qs::Ket q110 = q1.tensor(q1).tensor(q0);
+    qs::Ket q110 = q1 * q1 * q0;
     print_qubit(q110);
 
     qs::Bra b0(qs::BasicQubits::PLUS);
@@ -99,10 +159,10 @@ void test_unitary() {
     qs::Unitary Z = qs::PauliZ();
     print_unitary(Z);
 
-    qs::Unitary IX = I.tensor(X);
+    qs::Unitary IX = I * X;
     print_unitary(IX);
 
-    qs::Unitary XI = X.tensor(I);
+    qs::Unitary XI = X * I;
     print_unitary(XI);
 
     qs::Unitary CNOT = qs::CNOT();
@@ -110,8 +170,12 @@ void test_unitary() {
 }
 
 int main(int argc, char *argv[]) {
-    std::cout << "Test Complex library" << std::endl;
+    std::cout << "Test complex library" << std::endl;
     test_complex();
+    std::cout << std::endl;
+
+    std::cout << "Test vec_op library" << std::endl;
+    test_vec();
     std::cout << std::endl;
 
     std::cout << "Test Qubits library" << std::endl;

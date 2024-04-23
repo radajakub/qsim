@@ -9,6 +9,7 @@
 
 #include "complex.hpp"
 #include "qubit.hpp"
+#include "vec_op.hpp"
 
 namespace qs {
 
@@ -18,20 +19,29 @@ namespace qs {
     class Unitary {
     public:
         int dim;
-        std::vector<std::vector<Complex>> items;
+        c_mat items;
         std::string label;
 
-        Unitary(int dim, Complex coefficient, std::vector<std::vector<Complex>> items, std::string label);
-        Unitary(int dim, std::vector<std::vector<Complex>> items, std::string label) : Unitary(dim, Complex(1), items, label){};
+        Unitary(int dim, Complex coefficient, c_mat items, std::string label);
+        Unitary(int dim, c_mat items, std::string label) : Unitary(dim, Complex(1), items, label){};
 
-        Unitary dagger();
+        // complex conjugate and transposition
+        Unitary operator~();
 
         // perform tensor product for two unitary matrices
-        Unitary tensor(Unitary& other);
-
-        Unitary operator+(Unitary& other);
-        Unitary operator-(Unitary& other);
         Unitary operator*(Unitary& other);
+
+        // matrix multiplication
+        Unitary operator%(Unitary& other);
+
+        // addition of two matrices
+        Unitary operator+(Unitary& other);
+        // difference of two matrices
+        Unitary operator-(Unitary& other);
+        // scaling by a constant
+        Unitary operator*(Complex& c);
+
+        // apply this operator to a ket to produce a new ket
         Ket operator*(Ket& other);
 
         void symbol();

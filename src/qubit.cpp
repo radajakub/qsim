@@ -45,19 +45,6 @@ qs::Qubit::Qubit(qs::BasicQubits basis, bool ket) {
     this->items[1] *= coefficient;
 }
 
-std::vector<qs::Complex> qs::Qubit::_tensor_vector(std::vector<qs::Complex> v1, std::vector<qs::Complex> v2) {
-    int n = v1.size();
-    int m = v2.size();
-    std::vector<qs::Complex> result(n * m);
-    int idx = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < m; ++j) {
-            result[idx++] = v1[i] * v2[j];
-        }
-    }
-    return result;
-}
-
 std::string qs::Qubit::add_brackets(std::string label) {
     return "|" + label + "|";
 }
@@ -75,21 +62,21 @@ void qs::Ket::symbol() {
 }
 
 void qs::Ket::vector() {
-    std::cout << "[";
-    for (int i = 0; i < this->dim; ++i) {
-        if (i != 0) {
-            std::cout << ", ";
-        }
-        std::cout << this->items[i].str();
-    }
-    std::cout << "]^T";
+    qs::print_vec(this->items, true);
 }
 
-qs::Ket qs::Ket::tensor(Ket &other) {
+qs::Ket qs::Ket::operator*(Ket &other) {
     int new_dim = this->dim * other.dim;
-    std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
+    qs::c_vec new_items = qs::_tensor(this->items, other.items);
     std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Ket(new_dim, new_items, new_label);
+}
+
+qs::Unitary qs::Ket::operator*(qs::Bra &other) {
+    int new_dim = this->dim;
+    qs::c_mat new_items = qs::_outer(this->items, other.items);
+    std::string new_label = this->label + other.label;
+    return qs::Unitary(new_dim, new_items, new_label);
 }
 
 std::string qs::Bra::add_brackets(std::string label) {
@@ -101,51 +88,22 @@ void qs::Bra::symbol() {
 }
 
 void qs::Bra::vector() {
-    std::cout << "[";
-    for (int i = 0; i < this->dim; ++i) {
-        if (i != 0) {
-            std::cout << ", ";
-        }
-        std::cout << this->items[i].str();
-    }
-    std::cout << "]";
+    qs::print_vec(this->items);
 }
 
 qs::Bra qs::Bra::operator*(qs::Unitary &other) {
-    if (this->dim != other.dim) {
-        throw std::invalid_argument("*: Dimension Mismatch");
-    }
-
-    std::vector<qs::Complex> result(this->dim);
-    for (int i = 0; i < this->dim; i++) {
-        for (int j = 0; j < this->dim; j++) {
-            qs::Complex subres = this->items[j] * other.items[j][i];
-            result[i] += subres;
-        }
-    }
-
+    qs::c_vec new_items = qs::_vecmatmul(this->items, other.items);
     std::string new_label = this->label + other.label;
-
-    return qs::Bra(this->dim, result, new_label);
+    return qs::Bra(this->dim, new_items, new_label);
 }
 
-qs::Bra qs::Bra::tensor(Bra &other) {
+qs::Complex qs::Bra::operator*(qs::Ket &other) {
+    return qs::_inner(this->items, other.items);
+}
+
+qs::Bra qs::Bra::operator*(qs::Bra &other) {
     int new_dim = this->dim * other.dim;
-    std::vector<qs::Complex> new_items = qs::Qubit::_tensor_vector(this->items, other.items);
+    qs::c_vec new_items = qs::_tensor(this->items, other.items);
     std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Bra(new_dim, new_items, new_label);
-}
-
-qs::Complex qs::dot(Bra &bra, Ket &ket) {
-    if (bra.dim != ket.dim) {
-        std::cout << "Bra and Ket dimensions do not match" << std::endl;
-        exit(1);
-    }
-
-    qs::Complex result;
-    for (int i = 0; i < bra.dim; ++i) {
-        qs::Complex item = bra.items[i] * ket.items[i];
-        result += item;
-    }
-    return result;
 }

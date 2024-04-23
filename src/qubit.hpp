@@ -7,6 +7,7 @@
 
 #include "complex.hpp"
 #include "unitary.hpp"
+#include "vec_op.hpp"
 
 namespace qs {
 
@@ -17,17 +18,18 @@ namespace qs {
         MINUS = '-',
     };
 
+    // forward declarations
     class Unitary;
+    class Qubit;
+    class Ket;
+    class Bra;
 
     class Qubit {
     protected:
-        // helper function to compute tensor product of two vectors
-        static std::vector<Complex> _tensor_vector(std::vector<Complex> v1, std::vector<Complex> v2);
-
         // construct full Qubit
-        Qubit(int dim, Complex coefficient, std::vector<Complex> items, std::string label);
+        Qubit(int dim, Complex coefficient, c_vec items, std::string label);
         // construct Qubit with implicit coefficient being 1
-        Qubit(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, Complex(1), items, label){};
+        Qubit(int dim, c_vec items, std::string label) : Qubit(dim, Complex(1), items, label){};
         // construct one of predefined qubits from BasicQubits enum
         Qubit(BasicQubits basis, bool ket);
 
@@ -35,7 +37,7 @@ namespace qs {
         // dimension of the qubit, should always be 2^n
         int dim;
         // vector representation of the qubit
-        std::vector<Complex> items;
+        c_vec items;
         // symbol representation of the qubit
         std::string label;
 
@@ -51,37 +53,40 @@ namespace qs {
 
     class Ket : public Qubit {
     public:
-        Ket(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
-        Ket(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
+        Ket(int dim, Complex coefficient, c_vec items, std::string label) : Qubit(dim, coefficient, items, label){};
+        Ket(int dim, c_vec items, std::string label) : Qubit(dim, items, label){};
         Ket(BasicQubits basis) : Qubit(basis, true){};
 
         std::string add_brackets(std::string label) override;
-
         void symbol() override;
         void vector() override;
 
-        // preform tensor product with other ket
-        Ket tensor(Ket &other);
+        // tensor product between this ket and other ket
+        Ket operator*(Ket &other);
+
+        // outer product with a bra to construct unitary operator
+        Unitary operator*(Bra &other);
     };
 
     class Bra : public Qubit {
     public:
-        Bra(int dim, Complex coefficient, std::vector<Complex> items, std::string label) : Qubit(dim, coefficient, items, label){};
-        Bra(int dim, std::vector<Complex> items, std::string label) : Qubit(dim, items, label){};
+        Bra(int dim, Complex coefficient, c_vec items, std::string label) : Qubit(dim, coefficient, items, label){};
+        Bra(int dim, c_vec items, std::string label) : Qubit(dim, items, label){};
         Bra(BasicQubits basis) : Qubit(basis, false){};
 
         std::string add_brackets(std::string label) override;
         void symbol() override;
         void vector() override;
 
+        // apply unitary operator to this bra
         Bra operator*(Unitary &other);
 
-        // preform tensor product with other bra
-        Bra tensor(Bra &other);
+        // dot product with a ket
+        Complex operator*(Ket &other);
+
+        // tensor product with other bra
+        Bra operator*(Bra &other);
     };
-
-    Complex dot(Bra &bra, Ket &ket);
-
 };
 
 #endif
