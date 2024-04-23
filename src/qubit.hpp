@@ -63,7 +63,6 @@ namespace qs {
 
         // tensor product between this ket and other ket
         Ket operator*(Ket &other);
-
         // outer product with a bra to construct unitary operator
         Unitary operator*(Bra &other);
     };
@@ -80,10 +79,8 @@ namespace qs {
 
         // apply unitary operator to this bra
         Bra operator*(Unitary &other);
-
         // dot product with a ket
         Complex operator*(Ket &other);
-
         // tensor product with other bra
         Bra operator*(Bra &other);
     };

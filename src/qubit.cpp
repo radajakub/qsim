@@ -13,7 +13,7 @@ qs::Qubit::Qubit(qs::BasicQubits basis, bool ket) {
     dim = 2;
     this->items = std::vector<qs::Complex>(2);
     std::string symbol(1, static_cast<char>(basis));
-    // this->label = this->add_brackets(symbol);
+    this->label = this->add_brackets(symbol);
     if (ket) {
         this->label = "|" + symbol + ">";
     } else {

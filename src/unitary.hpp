@@ -27,20 +27,16 @@ namespace qs {
 
         // complex conjugate and transposition
         Unitary operator~();
-
         // perform tensor product for two unitary matrices
         Unitary operator*(Unitary& other);
-
         // matrix multiplication
         Unitary operator%(Unitary& other);
-
         // addition of two matrices
         Unitary operator+(Unitary& other);
         // difference of two matrices
         Unitary operator-(Unitary& other);
         // scaling by a constant
         Unitary operator*(Complex& c);
-
         // apply this operator to a ket to produce a new ket
         Ket operator*(Ket& other);
 
