@@ -106,7 +106,7 @@ qs::c_vec qs::_matvecmul(qs::c_mat& m, qs::c_vec& x) {
     qs::c_vec res(dim);
     for (int i = 0; i < dim; ++i) {
         for (int j = 0; j < dim; ++j) {
-            qs::Complex term = x[i] * m[i][j];
+            qs::Complex term = x[j] * m[i][j];
             res[i] += term;
         }
     }
@@ -123,7 +123,7 @@ qs::c_vec qs::_vecmatmul(qs::c_vec& x, qs::c_mat& m) {
     qs::c_vec res(dim);
     for (int i = 0; i < dim; ++i) {
         for (int j = 0; j < dim; ++j) {
-            qs::Complex term = x[i] * m[j][i];
+            qs::Complex term = x[j] * m[j][i];
             res[i] += term;
         }
     }
