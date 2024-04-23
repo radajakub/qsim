@@ -107,3 +107,11 @@ qs::Bra qs::Bra::operator*(qs::Bra &other) {
     std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Bra(new_dim, new_items, new_label);
 }
+
+qs::Ket qs::tensor_reduce(std::vector<qs::Ket> &qubits) {
+    qs::Ket qubit = qubits[0];
+    for (int i = 1; i < qubits.size(); ++i) {
+        qubit = qubit * qubits[i];
+    }
+    return qubit;
+}

@@ -7,7 +7,7 @@ BUILD_DIR=./build
 CXXFLAGS=-std=c++11 -O2 -march=native
 
 # Find all the C++ files in src and test directories
-LIBS=$(SRC_DIR)/complex.cpp $(SRC_DIR)/vec_op.cpp $(SRC_DIR)/qubit.cpp $(SRC_DIR)/unitary.cpp
+LIBS=$(SRC_DIR)/complex.cpp $(SRC_DIR)/vec_op.cpp $(SRC_DIR)/qubit.cpp $(SRC_DIR)/unitary.cpp $(SRC_DIR)/circuit.cpp 
 
 SRCS=$(LIBS) $(SRC_DIR)/main.cpp
 TSTS=$(LIBS) $(SRC_DIR)/test.cpp
@@ -34,6 +34,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 # Build targets
 all: $(TARGET)
+
+run: $(TARGET)
+	$(TARGET)
 
 test: $(TST_TARGET)
 	$(TST_TARGET)

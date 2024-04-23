@@ -56,6 +56,7 @@ namespace qs {
         Ket(int dim, Complex coefficient, c_vec items, std::string label) : Qubit(dim, coefficient, items, label){};
         Ket(int dim, c_vec items, std::string label) : Qubit(dim, items, label){};
         Ket(BasicQubits basis) : Qubit(basis, true){};
+        Ket() : Ket(BasicQubits::ZERO){};
 
         std::string add_brackets(std::string label) override;
         void symbol() override;
@@ -84,6 +85,8 @@ namespace qs {
         // tensor product with other bra
         Bra operator*(Bra &other);
     };
+
+    Ket tensor_reduce(std::vector<Ket> &qubits);
 };
 
 #endif

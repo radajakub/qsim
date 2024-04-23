@@ -24,6 +24,7 @@ namespace qs {
 
         Unitary(int dim, Complex coefficient, c_mat items, std::string label);
         Unitary(int dim, c_mat items, std::string label) : Unitary(dim, Complex(1), items, label){};
+        Unitary() : Unitary(2, c_mat(2, c_vec(2)), std::string("0")){};
 
         // complex conjugate and transposition
         Unitary operator~();
@@ -43,6 +44,8 @@ namespace qs {
         void symbol();
         void matrix();
     };
+
+    Unitary tensor_reduce(std::vector<Unitary>& gates);
 
     class Hadamard : public Unitary {
     public:

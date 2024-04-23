@@ -2,7 +2,7 @@
 
 qs::c_vec qs::_add(qs::c_vec& a, qs::c_vec& b) {
     if (a.size() != b.size()) {
-        std::cout << "_add: vector dimension mismatch" << std::endl;
+        std::cerr << "_add: vector dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -16,7 +16,7 @@ qs::c_vec qs::_add(qs::c_vec& a, qs::c_vec& b) {
 
 qs::c_vec qs::_sub(qs::c_vec& a, qs::c_vec& b) {
     if (a.size() != b.size()) {
-        std::cout << "_sub: vector dimension mismatch" << std::endl;
+        std::cerr << "_sub: vector dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -48,7 +48,7 @@ qs::c_vec qs::_conjugate(qs::c_vec& a) {
 
 qs::c_mat qs::_add(qs::c_mat& a, qs::c_mat& b) {
     if (a.size() != b.size()) {
-        std::cout << "_add: matrix dimension mismatch" << std::endl;
+        std::cerr << "_add: matrix dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -63,7 +63,7 @@ qs::c_mat qs::_add(qs::c_mat& a, qs::c_mat& b) {
 
 qs::c_mat qs::_sub(qs::c_mat& a, qs::c_mat& b) {
     if (a.size() != b.size()) {
-        std::cout << "_sub: matrix dimension mismatch" << std::endl;
+        std::cerr << "_sub: matrix dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -98,7 +98,7 @@ qs::c_mat qs::_dagger(qs::c_mat& a) {
 
 qs::c_vec qs::_matvecmul(qs::c_mat& m, qs::c_vec& x) {
     if (m.size() != x.size()) {
-        std::cout << "_matvecmul: matrix vector dimension mismatch" << std::endl;
+        std::cerr << "_matvecmul: matrix vector dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -115,7 +115,7 @@ qs::c_vec qs::_matvecmul(qs::c_mat& m, qs::c_vec& x) {
 
 qs::c_vec qs::_vecmatmul(qs::c_vec& x, qs::c_mat& m) {
     if (m.size() != x.size()) {
-        std::cout << "_vecmatmul: vector matrix dimension mismatch" << std::endl;
+        std::cerr << "_vecmatmul: vector matrix dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -132,7 +132,7 @@ qs::c_vec qs::_vecmatmul(qs::c_vec& x, qs::c_mat& m) {
 
 qs::c_mat qs::_matmul(qs::c_mat& a, qs::c_mat& b) {
     if (a.size() != b.size()) {
-        std::cout << "_matmul: matrix dimension mismatch" << std::endl;
+        std::cerr << "_matmul: matrix dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -151,7 +151,7 @@ qs::c_mat qs::_matmul(qs::c_mat& a, qs::c_mat& b) {
 
 qs::Complex qs::_inner(c_vec& a, c_vec& b) {
     if (a.size() != b.size()) {
-        std::cout << "_inner: vector dimension mismatch" << std::endl;
+        std::cerr << "_inner: vector dimension mismatch" << std::endl;
         exit(1);
     }
 
@@ -166,7 +166,7 @@ qs::Complex qs::_inner(c_vec& a, c_vec& b) {
 
 qs::c_mat qs::_outer(c_vec& a, c_vec& b) {
     if (a.size() != b.size()) {
-        std::cout << "_outer: vector dimension mismatch" << std::endl;
+        std::cerr << "_outer: vector dimension mismatch" << std::endl;
         exit(1);
     }
 

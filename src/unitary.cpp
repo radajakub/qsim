@@ -64,3 +64,11 @@ void qs::Unitary::symbol() {
 void qs::Unitary::matrix() {
     qs::print_mat(this->items);
 }
+
+qs::Unitary qs::tensor_reduce(std::vector<qs::Unitary> &gates) {
+    qs::Unitary res = gates[0];
+    for (int i = 1; i < gates.size(); ++i) {
+        res = res * gates[i];
+    }
+    return res;
+}
