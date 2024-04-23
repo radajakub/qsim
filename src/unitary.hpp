@@ -72,9 +72,9 @@ namespace qs {
         PauliZ() : Unitary(2, {{Complex(1), Complex(0)}, {Complex(0), Complex(-1)}}, std::string("Z")) {}
     };
 
-    class CNOT : public Unitary {
+    class Proj : public Unitary {
     public:
-        CNOT() : Unitary(4, {{Complex(1), Complex(0), Complex(0), Complex(0)}, {Complex(0), Complex(1), Complex(0), Complex(0)}, {Complex(0), Complex(0), Complex(0), Complex(1)}, {Complex(0), Complex(0), Complex(1), Complex(0)}}, std::string("CX")) {}
+        Proj(qs::BasicQubits basis);
     };
 
 };

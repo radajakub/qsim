@@ -6,17 +6,11 @@
 #include <vector>
 
 #include "complex.hpp"
+#include "const.hpp"
 #include "unitary.hpp"
 #include "vec_op.hpp"
 
 namespace qs {
-
-    enum BasicQubits : char {
-        ZERO = '0',
-        ONE = '1',
-        PLUS = '+',
-        MINUS = '-',
-    };
 
     // forward declarations
     class Unitary;

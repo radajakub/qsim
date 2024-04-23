@@ -1,6 +1,7 @@
 #ifndef __CIRCUIT_HPP__
 #define __CIRCUIT_HPP__
 
+#include <string>
 #include <vector>
 
 #include "qubit.hpp"
@@ -18,9 +19,16 @@ namespace qs {
 
     public:
         Circuit(std::vector<Ket> &qubits);
-        Circuit(int n_qubits);
+        Circuit(int n_qubits, BasicQubits basis = BasicQubits::ZERO);
 
-        void gate(int qubit, Unitary gate);
+        // insert gate for a single qubit
+        void gate(Unitary gate, int qubit);
+        // insert the same gate for qubits in parallel
+        void gate(Unitary gate, std::vector<int> qubits);
+        // insert gate for every qubit
+        void gate(Unitary gate);
+
+        void cgate(Unitary gate, int control, int target);
 
         // compile the gates into one
         void compile();

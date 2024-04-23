@@ -29,7 +29,7 @@ qs::Unitary qs::Unitary::operator*(qs::Unitary &other) {
 
 qs::Unitary qs::Unitary::operator%(qs::Unitary &other) {
     qs::c_mat new_items = qs::_matmul(this->items, other.items);
-    std::string new_label = this->label + other.label;
+    std::string new_label = "(" + this->label + ")(" + other.label + ")";
     return qs::Unitary(this->dim, new_items, new_label);
 }
 
@@ -47,7 +47,7 @@ qs::Unitary qs::Unitary::operator-(qs::Unitary &other) {
 
 qs::Unitary qs::Unitary::operator*(qs::Complex &c) {
     qs::c_mat new_items = qs::_mul(c, this->items);
-    std::string new_label = c.str() + this->label;
+    std::string new_label = c.str() + "(" + this->label + ")";
     return qs::Unitary(this->dim, new_items, new_label);
 }
 
@@ -71,4 +71,13 @@ qs::Unitary qs::tensor_reduce(std::vector<qs::Unitary> &gates) {
         res = res * gates[i];
     }
     return res;
+}
+
+qs::Proj::Proj(qs::BasicQubits basis) {
+    qs::Ket ket(basis);
+    qs::Bra bra(basis);
+    qs::Unitary proj = ket * bra;
+    this->dim = proj.dim;
+    this->label = proj.label;
+    this->items = proj.items;
 }
