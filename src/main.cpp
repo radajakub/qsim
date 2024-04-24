@@ -5,11 +5,11 @@
 #include "qubit.hpp"
 
 int main(int argc, char* argv[]) {
-    qs::Circuit circuit(2, qs::BasicQubits::ZERO);
+    qs::Circuit circuit(2);
 
-    // circuit.gate(qs::Hadamard(), 0);
-    // circuit.gate(qs::PauliX(), 1);
-    circuit.cgate(qs::PauliX(), 1, 0);
+    // circuit.gate(qs::Hadamard(), 1);
+    circuit.gate(qs::PauliX(), 1);
+    circuit.cgate(qs::PauliX(), 0, 1);
 
     circuit.display();
 
@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 
     circuit.display();
 
-    // circuit.run();
+    circuit.run(1000);
 
     return 0;
 }

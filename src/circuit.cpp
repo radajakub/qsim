@@ -1,18 +1,18 @@
 #include "circuit.hpp"
 
-qs::Circuit::Circuit(std::vector<Ket> &qubits) {
+qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
     if (qubits.size() == 0) {
         std::cerr << "_add: vector dimension mismatch" << std::endl;
         exit(1);
     }
     this->n_qubits = qubits.size();
-    this->qubit = qs::tensor_reduce(qubits);
+    this->n_bits = n_bits;
+    this->qubits = qubits;
 }
 
-qs::Circuit::Circuit(int n_qubits, BasicQubits basis) {
-    std::vector<qs::Ket> qubits(n_qubits, qs::Ket(basis));
+qs::Circuit::Circuit(int n_qubits, int n_bits, BasicQubits basis) {
     this->n_qubits = n_qubits;
-    this->qubit = qs::tensor_reduce(qubits);
+    this->qubits = std::vector<qs::Ket>(n_qubits, qs::Ket(basis));
 }
 
 void qs::Circuit::gate(qs::Unitary gate, int qubit) {
@@ -97,6 +97,9 @@ void qs::Circuit::compile() {
         exit(1);
     }
 
+    // reduce qubits into one qubit
+    this->full_qubit = qs::tensor_reduce(this->qubits);
+
     // we need to reverse the order
     // |x>-X-Y-Z => ZYX|x>
     this->full_gate = this->gates[n - 1];
@@ -107,24 +110,29 @@ void qs::Circuit::compile() {
     this->compiled = true;
 }
 
-void qs::Circuit::run() {
+qs::Results qs::Circuit::run(int shots) {
     if (!this->compiled) {
         std::cerr << "run: circuit was not compiled" << std::endl;
         exit(1);
     }
 
-    qs::Ket res = this->full_gate * this->qubit;
+    qs::Ket res = this->full_gate * this->full_qubit;
     res.vector();
     std::cout << std::endl;
+
+    return qs::Results();
 }
 
 void qs::Circuit::display() {
     if (!this->compiled) {
         std::cout << "Circuit is not compiled" << std::endl;
-        std::cout << "Qubit: ";
-        this->qubit.symbol();
-        std::cout << " = ";
-        this->qubit.vector();
+        std::cout << "Qubits:" << std::endl;
+        for (qs::Ket &qubit : this->qubits) {
+            qubit.symbol();
+            std::cout << " = ";
+            qubit.vector();
+            std::cout << std::endl;
+        }
         std::cout << std::endl;
         std::cout << "Gates:" << std::endl;
         for (qs::Unitary &gate : this->gates) {
@@ -135,9 +143,9 @@ void qs::Circuit::display() {
     } else {
         std::cout << "Circuit is compiled" << std::endl;
         std::cout << "Qubit: ";
-        this->qubit.symbol();
+        this->full_qubit.symbol();
         std::cout << " = ";
-        this->qubit.vector();
+        this->full_qubit.vector();
         std::cout << std::endl;
         std::cout << "Full gate:" << std::endl;
         this->full_gate.matrix();
