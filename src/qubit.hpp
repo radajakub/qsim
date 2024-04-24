@@ -36,7 +36,7 @@ namespace qs {
         std::string label;
 
         // manipulate label string
-        virtual std::string add_brackets(std::string label);
+        static std::string add_brackets(std::string label);
         std::string strip_brackets();
 
         // print qubit in symbol representation
@@ -52,7 +52,7 @@ namespace qs {
         Ket(BasicQubits basis) : Qubit(basis, true){};
         Ket() : Ket(BasicQubits::ZERO){};
 
-        std::string add_brackets(std::string label) override;
+        static std::string add_brackets(std::string label);
         void symbol() override;
         void vector() override;
 
@@ -60,6 +60,8 @@ namespace qs {
         Ket operator*(Ket &other);
         // outer product with a bra to construct unitary operator
         Unitary operator*(Bra &other);
+
+        Bra conjugate();
     };
 
     class Bra : public Qubit {
@@ -68,7 +70,7 @@ namespace qs {
         Bra(int dim, c_vec items, std::string label) : Qubit(dim, items, label){};
         Bra(BasicQubits basis) : Qubit(basis, false){};
 
-        std::string add_brackets(std::string label) override;
+        static std::string add_brackets(std::string label);
         void symbol() override;
         void vector() override;
 
@@ -78,9 +80,12 @@ namespace qs {
         Complex operator*(Ket &other);
         // tensor product with other bra
         Bra operator*(Bra &other);
+
+        Ket conjugate();
     };
 
     Ket tensor_reduce(std::vector<Ket> &qubits);
+    Bra tensor_reduce(std::vector<Bra> &qubits);
 };
 
 #endif

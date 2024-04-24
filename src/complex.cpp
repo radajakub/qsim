@@ -34,6 +34,10 @@ qs::Complex qs::Complex::conjugate() {
     return qs::Complex(this->Re, -this->Im);
 }
 
+double qs::Complex::magnitude() {
+    return sqrt(this->Re * this->Re + this->Im * this->Im);
+}
+
 std::string qs::Complex::str() {
     std::stringstream ss;
     ss << this->Re;

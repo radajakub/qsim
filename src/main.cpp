@@ -7,9 +7,9 @@
 int main(int argc, char* argv[]) {
     qs::Circuit circuit(2);
 
-    // circuit.gate(qs::Hadamard(), 1);
-    circuit.gate(qs::PauliX(), 1);
-    circuit.cgate(qs::PauliX(), 0, 1);
+    circuit.gate(qs::Hadamard(), 0);
+
+    circuit.measure(0, 0);
 
     circuit.display();
 

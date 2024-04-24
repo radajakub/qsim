@@ -31,6 +31,11 @@ void qs::Circuit::gate(qs::Unitary gate, int qubit) {
         exit(1);
     }
 
+    if (this->measurement_mapping[qubit] != -1) {
+        std::cerr << "gate: qubit is already measured" << std::endl;
+        exit(1);
+    }
+
     std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, qs::Identity());
     sub_gates[qubit] = gate;
     this->gates.push_back(qs::tensor_reduce(sub_gates));
@@ -40,6 +45,11 @@ void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
     for (int qubit : qubits) {
         if (qubit >= this->n_qubits || qubit < 0) {
             std::cerr << "gate: qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
+            exit(1);
+        }
+
+        if (this->measurement_mapping[qubit] != -1) {
+            std::cerr << "gate: qubit is already measured" << std::endl;
             exit(1);
         }
     }
@@ -52,6 +62,13 @@ void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
 }
 
 void qs::Circuit::gate(qs::Unitary gate) {
+    for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
+        if (this->measurement_mapping[qubit] != -1) {
+            std::cerr << "gate: qubit is already measured" << std::endl;
+            exit(1);
+        }
+    }
+
     std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, gate);
     this->gates.push_back(qs::tensor_reduce(sub_gates));
 }
@@ -69,6 +86,16 @@ void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
 
     if (control == target) {
         std::cerr << "cgate: control and target qubits are the same" << std::endl;
+        exit(1);
+    }
+
+    if (this->measurement_mapping[control] != -1) {
+        std::cerr << "cgate: control qubit is already measured" << std::endl;
+        exit(1);
+    }
+
+    if (this->measurement_mapping[target] != -1) {
+        std::cerr << "cgate: target qubit is already measured" << std::endl;
         exit(1);
     }
 
@@ -93,6 +120,20 @@ void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
     qs::Unitary result = inactive + active;
     result.label = "C" + gate.label + "[" + std::to_string(control) + "," + std::to_string(target) + "]";
     this->gates.push_back(result);
+}
+
+void qs::Circuit::measure(int qubit, int bit) {
+    if (qubit >= this->n_qubits || qubit < 0) {
+        std::cerr << "measure: qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
+        exit(1);
+    }
+
+    if (bit >= this->n_bits || bit < 0) {
+        std::cerr << "measure: bit index out of range [0," << this->n_bits - 1 << "]" << std::endl;
+        exit(1);
+    }
+
+    this->measurement_mapping[qubit] = bit;
 }
 
 void qs::Circuit::compile() {
@@ -126,9 +167,31 @@ qs::Results qs::Circuit::run(int shots) {
         exit(1);
     }
 
-    qs::Ket res = this->full_gate * this->full_qubit;
-    res.vector();
+    qs::Ket ket_res = this->full_gate * this->full_qubit;
+    qs::Bra bra_res = ket_res.conjugate();
+
+    std::cout << "Resulting vector: ";
+    ket_res.vector();
     std::cout << std::endl;
+
+    std::cout << "Measuring probabilities: ";
+
+    // for now measure only first qubit for two qubit system
+    double p0 = 0;
+    qs::Unitary proj00 = qs::Proj({qs::BasicQubits::ZERO, qs::BasicQubits::ZERO});
+    qs::Unitary proj01 = qs::Proj({qs::BasicQubits::ZERO, qs::BasicQubits::ONE});
+
+    p0 += (bra_res * proj00 * ket_res).magnitude();
+    p0 += (bra_res * proj01 * ket_res).magnitude();
+    std::cout << "P(0) = " << p0 << std::endl;
+
+    double p1 = 0;
+    qs::Unitary proj10 = qs::Proj({qs::BasicQubits::ONE, qs::BasicQubits::ZERO});
+    qs::Unitary proj11 = qs::Proj({qs::BasicQubits::ONE, qs::BasicQubits::ONE});
+
+    p1 += (bra_res * proj10 * ket_res).magnitude();
+    p1 += (bra_res * proj11 * ket_res).magnitude();
+    std::cout << "P(1) = " << p1 << std::endl;
 
     return qs::Results();
 }

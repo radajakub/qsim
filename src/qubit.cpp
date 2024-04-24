@@ -79,6 +79,12 @@ qs::Unitary qs::Ket::operator*(qs::Bra &other) {
     return qs::Unitary(new_dim, new_items, new_label);
 }
 
+qs::Bra qs::Ket::conjugate() {
+    qs::c_vec new_items = qs::_conjugate(this->items);
+    std::string new_label = qs::Bra::add_brackets(this->strip_brackets());
+    return qs::Bra(this->dim, new_items, new_label);
+}
+
 std::string qs::Bra::add_brackets(std::string label) {
     return "<" + label + "|";
 }
@@ -104,12 +110,26 @@ qs::Complex qs::Bra::operator*(qs::Ket &other) {
 qs::Bra qs::Bra::operator*(qs::Bra &other) {
     int new_dim = this->dim * other.dim;
     qs::c_vec new_items = qs::_tensor(this->items, other.items);
-    std::string new_label = this->add_brackets(this->strip_brackets() + other.strip_brackets());
+    std::string new_label = qs::Bra::add_brackets(this->strip_brackets() + other.strip_brackets());
     return qs::Bra(new_dim, new_items, new_label);
+}
+
+qs::Ket qs::Bra::conjugate() {
+    qs::c_vec new_items = qs::_conjugate(this->items);
+    std::string new_label = qs::Ket::add_brackets(this->strip_brackets());
+    return qs::Ket(this->dim, new_items, new_label);
 }
 
 qs::Ket qs::tensor_reduce(std::vector<qs::Ket> &qubits) {
     qs::Ket qubit = qubits[0];
+    for (int i = 1; i < qubits.size(); ++i) {
+        qubit = qubit * qubits[i];
+    }
+    return qubit;
+}
+
+qs::Bra qs::tensor_reduce(std::vector<qs::Bra> &qubits) {
+    qs::Bra qubit = qubits[0];
     for (int i = 1; i < qubits.size(); ++i) {
         qubit = qubit * qubits[i];
     }

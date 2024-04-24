@@ -74,7 +74,10 @@ namespace qs {
 
     class Proj : public Unitary {
     public:
-        Proj(qs::BasicQubits basis);
+        // creates a projection operator to a single qubit basis, i.e. |0><0| or |1><1|
+        Proj(qs::BasicQubits basis) : Proj(std::vector<qs::BasicQubits>{basis}){};
+        // creates a projection operator to multiple qubit basis, i.e. |00><00| or |11><11| or more
+        Proj(std::vector<qs::BasicQubits> bases);
     };
 
 };

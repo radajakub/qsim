@@ -73,9 +73,18 @@ qs::Unitary qs::tensor_reduce(std::vector<qs::Unitary> &gates) {
     return res;
 }
 
-qs::Proj::Proj(qs::BasicQubits basis) {
-    qs::Ket ket(basis);
-    qs::Bra bra(basis);
+qs::Proj::Proj(std::vector<qs::BasicQubits> bases) {
+    int k = bases.size();
+    std::vector<qs::Ket> kets;
+    kets.reserve(k);
+    std::vector<qs::Bra> bras;
+    bras.reserve(k);
+    for (qs::BasicQubits &basis : bases) {
+        kets.push_back(qs::Ket(basis));
+        bras.push_back(qs::Bra(basis));
+    }
+    qs::Ket ket = qs::tensor_reduce(kets);
+    qs::Bra bra = qs::tensor_reduce(bras);
     qs::Unitary proj = ket * bra;
     this->dim = proj.dim;
     this->label = proj.label;

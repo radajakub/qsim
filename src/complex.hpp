@@ -24,6 +24,8 @@ namespace qs {
 
         Complex conjugate();
 
+        double magnitude();
+
         std::string str();
     };
 };
