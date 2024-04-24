@@ -42,12 +42,8 @@ void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
 }
 
 void qs::Circuit::gate(qs::Unitary gate) {
-    if (gate.dim != this->qubit.dim) {
-        std::cerr << "gate: gate dimension mismatch" << std::endl;
-        exit(1);
-    }
-
-    this->gates.push_back(gate);
+    std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, gate);
+    this->gates.push_back(qs::tensor_reduce(sub_gates));
 }
 
 void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
@@ -84,40 +80,10 @@ void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
     }
     qs::Unitary inactive = qs::tensor_reduce(inactive_parts);
     qs::Unitary active = qs::tensor_reduce(active_parts);
-    this->gates.push_back(inactive + active);
+    qs::Unitary result = inactive + active;
+    result.label = "C" + gate.label + "[" + std::to_string(control) + "," + std::to_string(target) + "]";
+    this->gates.push_back(result);
 }
-
-// void qs::Circuit::cgate(qs::Unitary gate, std::vector<int> controls, int target) {
-//     qs::Unitary proj0 = qs::Proj(qs::BasicQubits::ZERO);
-//     qs::Unitary proj1 = qs::Proj(qs::BasicQubits::ONE);
-//     std::vector<qs::Unitary> inactive_parts;
-//     std::vector<qs::Unitary> active_parts;
-
-//     std::vector<bool> is_control(this->n_qubits, false);
-//     for (int control : controls) {
-//         if (control >= this->n_qubits || control < 0) {
-//             std::cerr << "cgate: control qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-//             exit(1);
-//         }
-//         is_control[control] = true;
-//     }
-
-//     for (int i = 0; i < this->n_qubits; ++i) {
-//         if (i == target) {
-//             active_parts.push_back(gate);
-//             inactive_parts.push_back(qs::Identity());
-//         } else if (is_control[i]) {
-//             active_parts.push_back(proj1);
-//             inactive_parts.push_back(proj0);
-//         } else {
-//             active_parts.push_back(qs::Identity());
-//             inactive_parts.push_back(qs::Identity());
-//         }
-//     }
-//     qs::Unitary inactive = qs::tensor_reduce(inactive_parts);
-//     qs::Unitary active = qs::tensor_reduce(active_parts);
-//     this->gates.push_back(inactive + active);
-// }
 
 void qs::Circuit::compile() {
     if (this->compiled) {
@@ -138,10 +104,6 @@ void qs::Circuit::compile() {
         this->full_gate = this->full_gate % this->gates[i];
     }
 
-    this->full_gate.symbol();
-    std::cout << std::endl;
-    this->full_gate.matrix();
-
     this->compiled = true;
 }
 
@@ -157,13 +119,28 @@ void qs::Circuit::run() {
 }
 
 void qs::Circuit::display() {
-    std::cout << "Circuit is compiled" << std::endl;
-    std::cout << "Qubit: ";
-    this->qubit.symbol();
-    std::cout << std::endl;
-    std::cout << "Gates:" << std::endl;
-    for (qs::Unitary &gate : this->gates) {
-        gate.symbol();
+    if (!this->compiled) {
+        std::cout << "Circuit is not compiled" << std::endl;
+        std::cout << "Qubit: ";
+        this->qubit.symbol();
+        std::cout << " = ";
+        this->qubit.vector();
+        std::cout << std::endl;
+        std::cout << "Gates:" << std::endl;
+        for (qs::Unitary &gate : this->gates) {
+            gate.symbol();
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+    } else {
+        std::cout << "Circuit is compiled" << std::endl;
+        std::cout << "Qubit: ";
+        this->qubit.symbol();
+        std::cout << " = ";
+        this->qubit.vector();
+        std::cout << std::endl;
+        std::cout << "Full gate:" << std::endl;
+        this->full_gate.matrix();
         std::cout << std::endl;
     }
 }
