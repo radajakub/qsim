@@ -5,14 +5,24 @@ qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
         std::cerr << "_add: vector dimension mismatch" << std::endl;
         exit(1);
     }
+
+    this->compiled = false;
+
     this->n_qubits = qubits.size();
-    this->n_bits = n_bits;
     this->qubits = qubits;
+
+    this->n_bits = n_bits;
+    this->measurement_mapping = std::vector<int>(this->n_qubits, -1);
 }
 
 qs::Circuit::Circuit(int n_qubits, int n_bits, BasicQubits basis) {
+    this->compiled = false;
+
     this->n_qubits = n_qubits;
     this->qubits = std::vector<qs::Ket>(n_qubits, qs::Ket(basis));
+
+    this->n_bits = n_bits;
+    this->measurement_mapping = std::vector<int>(this->n_qubits, -1);
 }
 
 void qs::Circuit::gate(qs::Unitary gate, int qubit) {
