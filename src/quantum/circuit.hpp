@@ -2,6 +2,7 @@
 #define __CIRCUIT_HPP__
 
 #include <iostream>
+#include <random>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -80,14 +81,22 @@ namespace qs {
 
     class Results {
     private:
+        std::mt19937 rng;
+        std::uniform_real_distribution<double> dist;
+
         std::unordered_map<std::string, Outcome> outcomes;
+        std::unordered_map<std::string, int> counts;
+        int shots;
 
     public:
-        Results(){};
+        Results(int shots);
 
         void add_outcome(std::string &bits, double p);
 
-        void show();
+        void run();
+
+        void show_outcomes();
+        void show_counts();
     };
 };
 

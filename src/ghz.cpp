@@ -23,8 +23,8 @@ int main(int argc, char* argv[]) {
     circuit.compile();
 
     // run the circuit
-    qs::Results results = circuit.run(1000);
-    results.show();
+    qs::Results results = circuit.run(1024);
+    results.show_counts();
 
     return 0;
 }

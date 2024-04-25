@@ -163,7 +163,7 @@ qs::Results qs::Circuit::run(int shots) {
     qs::Ket ket_res = this->full_gate * this->full_qubit;
     qs::Bra bra_res = ket_res.conjugate();
 
-    qs::Results results;
+    qs::Results results(shots);
 
     // generate all projections
     std::vector<qs::BasicQubits> basic_qubits = {qs::BasicQubits::ZERO, qs::BasicQubits::ONE};
@@ -181,6 +181,9 @@ qs::Results qs::Circuit::run(int shots) {
         // add the outcome or increase its probability
         results.add_outcome(bits, p);
     }
+
+    // conduct experiment on the outcomes
+    results.run();
 
     return results;
 }
@@ -231,6 +234,13 @@ void qs::Outcome::show() {
     std::cout << this->bits << " [p=" << this->p << "]" << std::endl;
 }
 
+qs::Results::Results(int shots) {
+    this->shots = shots;
+    std::random_device rd;
+    this->rng = std::mt19937(rd());
+    this->dist = std::uniform_real_distribution<double>(0, 1);
+}
+
 void qs::Results::add_outcome(std::string &bits, double p) {
     // ignore outcomes that have zero probability
     if (p == 0) {
@@ -243,10 +253,53 @@ void qs::Results::add_outcome(std::string &bits, double p) {
     this->outcomes[bits].add_p(p);
 }
 
-void qs::Results::show() {
+void qs::Results::run() {
+    // reset the counts to zeros for each possible outcome
+    this->counts.clear();
+    for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
+        this->counts[key_val.second.bits] = 0;
+    }
+
+    // sample shots times an outcome based on its probability
+    for (int i = 0; i < this->shots; ++i) {
+        double prob = this->dist(this->rng);
+        double cum_prob = 0.0;
+        for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
+            qs::Outcome outcome = key_val.second;
+            cum_prob += outcome.p;
+            if (prob < cum_prob) {
+                this->counts[outcome.bits] += 1;
+                break;
+            }
+        }
+    }
+}
+
+void qs::Results::show_outcomes() {
     std::cout << "Outcomes with probability:" << std::endl;
     for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
         qs::Outcome outcome = key_val.second;
         outcome.show();
+    }
+}
+
+void qs::Results::show_counts() {
+    int line_width = 100;
+    double unit = (double)line_width / this->shots;
+    int count;
+    int filled;
+    int nonfilled;
+    double percent;
+    std::string meter;
+    std::string rest;
+    for (const std::pair<const std::string, const int> &key_val : this->counts) {
+        std::string bits = key_val.first;
+        count = key_val.second;
+        filled = floor(unit * count);
+        nonfilled = line_width - filled;
+        meter = std::string(filled, '#');
+        rest = std::string(nonfilled, '.');
+        percent = (double)count / this->shots * 100;
+        std::cout << bits << " |" << meter << rest << "| " << percent << "% (" << count << "/" << this->shots << ")" << std::endl;
     }
 }
