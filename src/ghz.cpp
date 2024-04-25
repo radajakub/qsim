@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "circuit.hpp"
-#include "qubit.hpp"
+#include "quantum/circuit.hpp"
+#include "quantum/unitary.hpp"
 
 int main(int argc, char* argv[]) {
     qs::Circuit circuit(2, 2);

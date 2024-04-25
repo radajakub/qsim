@@ -1,4 +1,4 @@
-#include "qubit.hpp"
+#include "./qubit.hpp"
 
 qs::Qubit::Qubit(int dim, qs::Complex coefficient, std::vector<qs::Complex> items, std::string label) {
     this->dim = dim;

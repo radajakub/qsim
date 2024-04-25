@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 
-#include "complex.hpp"
-#include "err.hpp"
+#include "../utils/err.hpp"
+#include "./complex.hpp"
 
 // NOTE: consider only square matrices
 namespace qs {

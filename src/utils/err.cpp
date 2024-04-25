@@ -1,4 +1,4 @@
-#include "err.hpp"
+#include "./err.hpp"
 
 void qs::check_err(bool condition, std::string caller, std::string message) {
     if (condition) {

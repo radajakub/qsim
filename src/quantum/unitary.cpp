@@ -1,4 +1,4 @@
-#include "unitary.hpp"
+#include "./unitary.hpp"
 
 qs::Unitary::Unitary(int dim, qs::Complex coefficient, qs::c_mat items, std::string label) {
     this->dim = dim;

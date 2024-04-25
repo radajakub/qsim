@@ -1,4 +1,4 @@
-#include "circuit.hpp"
+#include "./circuit.hpp"
 
 qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
     qs::check_err(qubits.size() != n_bits, "circuit", "vector dimension mismatch");

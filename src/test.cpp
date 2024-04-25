@@ -164,9 +164,6 @@ void test_unitary() {
 
     qs::Unitary XI = X * I;
     print_unitary(XI);
-
-    qs::Unitary CNOT = qs::CNOT();
-    print_unitary(CNOT);
 }
 
 int main(int argc, char *argv[]) {

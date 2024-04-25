@@ -7,10 +7,10 @@
 #include <string>
 #include <vector>
 
-#include "basis.hpp"
-#include "complex.hpp"
-#include "qubit.hpp"
-#include "vec_op.hpp"
+#include "../lib/complex.hpp"
+#include "../lib/vec_op.hpp"
+#include "./basis.hpp"
+#include "./qubit.hpp"
 
 namespace qs {
 

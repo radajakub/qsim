@@ -5,10 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "basis.hpp"
-#include "complex.hpp"
-#include "unitary.hpp"
-#include "vec_op.hpp"
+#include "../lib/complex.hpp"
+#include "../lib/vec_op.hpp"
+#include "./basis.hpp"
+#include "./unitary.hpp"
 
 namespace qs {
 
