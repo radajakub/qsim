@@ -21,16 +21,21 @@ namespace qs {
     private:
         int n_qubits;
         int n_bits;
+        // list of intial qubits in the circuit
         std::vector<Ket> qubits;
+        // list of gates to apply on initial qubits
+        // are stored already in parallel format, i.e. tensor products
         std::vector<Unitary> gates;
         // map qubit index to measurement bit index
         std::vector<int> measurement_mapping;
 
+        // variables that are filled during compilation
         bool compiled;
+        // tensor product of initial qubits
         Ket full_qubit;
+        // all unitary gates multiplied into one matrix
         Unitary full_gate;
         std::vector<int> measured_qubits;
-        std::vector<int> nonmeasured_qubits;
 
     public:
         Circuit(std::vector<Ket> &qubits) : Circuit(qubits, qubits.size()){};
@@ -50,12 +55,13 @@ namespace qs {
         // add measurement of qubit into classical bit
         void measure(int qubit, int bit);
 
+        // recursive function to generate all variations of basis qubits of length n_qubits
         void _generate_projections(std::vector<std::vector<BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis = {});
 
-        // compile the gates into one
+        // prepare the initial qubits and gates for the computation
         void compile();
 
-        // run the experiment and report results
+        // run the experiment
         Results run(int shots);
 
         // show the circuit based on if it was compiled or not
@@ -67,6 +73,7 @@ namespace qs {
         Outcome(){};
         Outcome(std::string &bits) : bits(bits), p(0.0){};
 
+        // encode vector of basis qubits into classical bits
         static std::string get_bits(std::vector<BasicQubits> &basis, std::vector<int> &measured_qubits, std::vector<int> &measurement_mapping);
 
         // outcome is a list of classical bits measured with a probability distribution
@@ -74,6 +81,7 @@ namespace qs {
         // probability of measuring 1
         double p;
 
+        // add measured probability p
         void add_p(double p);
 
         void show();

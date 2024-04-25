@@ -132,11 +132,8 @@ void qs::Circuit::compile() {
     qs::check_err(!all_classical_used, "compile", "not all classical bits are used, either remove the extra ones or use them for some qubit");
 
     this->measured_qubits.resize(0);
-    this->nonmeasured_qubits.resize(0);
     for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
-        if (this->measurement_mapping[qubit] == -1) {
-            this->nonmeasured_qubits.push_back(qubit);
-        } else {
+        if (this->measurement_mapping[qubit] != -1) {
             this->measured_qubits.push_back(qubit);
         }
     }

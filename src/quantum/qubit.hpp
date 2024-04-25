@@ -60,7 +60,7 @@ namespace qs {
         Ket operator*(Ket &other);
         // outer product with a bra to construct unitary operator
         Unitary operator*(Bra &other);
-
+        // create a bra from ket
         Bra conjugate();
     };
 
@@ -80,10 +80,11 @@ namespace qs {
         Complex operator*(Ket &other);
         // tensor product with other bra
         Bra operator*(Bra &other);
-
+        // create a ket from bra
         Ket conjugate();
     };
 
+    // compute tensor product of list of qubits
     Ket tensor_reduce(std::vector<Ket> &qubits);
     Bra tensor_reduce(std::vector<Bra> &qubits);
 };
