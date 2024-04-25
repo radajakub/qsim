@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "basis.hpp"
 #include "complex.hpp"
 #include "qubit.hpp"
 #include "vec_op.hpp"

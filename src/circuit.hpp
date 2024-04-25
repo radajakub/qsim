@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "basis.hpp"
 #include "err.hpp"
 #include "qubit.hpp"
 #include "unitary.hpp"

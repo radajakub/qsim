@@ -1,5 +1,5 @@
-#ifndef __CONST_HPP__
-#define __CONST_HPP__
+#ifndef __BASIS_HPP__
+#define __BASIS_HPP__
 
 namespace qs {
     enum BasicQubits : char {

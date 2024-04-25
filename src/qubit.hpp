@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "basis.hpp"
 #include "complex.hpp"
-#include "const.hpp"
 #include "unitary.hpp"
 #include "vec_op.hpp"
 

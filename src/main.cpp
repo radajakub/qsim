@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "circuit.hpp"
-#include "const.hpp"
 #include "qubit.hpp"
 
 int main(int argc, char* argv[]) {
