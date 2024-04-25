@@ -1,0 +1,60 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper,total={18cm, 24cm}]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage[ddmmyyyy]{datetime}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{amsfonts}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\today}
+\chead{QUA - HW2: Quantum simulator}
+\rhead{Jakub Rada}
+
+\begin{document}
+I tried to implement the Quantum Circuits model for quantum computing and tested it on the GHZ state.
+I also checked my results agains GHZ in the Qiskit framework.
+
+My goal was to try to implement it in a very general way to allow easier addition of more complicated gates and operations.
+I describe it more thoroughly in the README file.
+
+\subsection*{GHZ}
+There is a prepared a target for the GHZ state in a file \texttt{src/ghz.cpp}.
+It can be compiled using CMake and run with the following steps:
+\begin{enumerate}
+    \item \texttt{mkdir build \&\& cd build}
+    \item \texttt{cmake ..}
+    \item \texttt{make ghz}
+    \item \texttt{./ghz}
+\end{enumerate}
+The program prepares the quantum circuit for preparing the GHZ qubit and measuring all three qubits, each into its own classical register.
+It is set to work on a three qubit system and $1024$ shots for measurement (as is the default in qiskit, I believe).
+
+The results for three consecutive experiments look as follows:
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{| c | c | c | c |}
+        \hline
+        outcomes & counts (exp 1) & counts (exp 2) & counts (exp 3) \\
+        \hline
+        \hline
+        $000$    & $506$          & $534$          & $500$          \\
+        \hline
+        $111$    & $518$          & $490$          & $524$          \\
+        \hline
+        \hline
+        sum      & $1024$         & $1024$         & $1024$         \\
+        \hline
+    \end{tabular}
+\end{table}
+
+More details about the implementation and API of the simulator is provided in the README.md file.
+
+\end{document}
