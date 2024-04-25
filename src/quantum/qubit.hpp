@@ -69,6 +69,7 @@ namespace qs {
         Bra(int dim, Complex coefficient, c_vec items, std::string label) : Qubit(dim, coefficient, items, label){};
         Bra(int dim, c_vec items, std::string label) : Qubit(dim, items, label){};
         Bra(BasicQubits basis) : Qubit(basis, false){};
+        Bra() : Bra(BasicQubits::ZERO){};
 
         static std::string add_brackets(std::string label);
         void symbol() override;
