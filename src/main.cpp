@@ -12,15 +12,15 @@ int main(int argc, char* argv[]) {
     circuit.measure(0, 0);
     circuit.measure(1, 1);
 
-    circuit.display();
+    circuit.show();
 
     circuit.compile();
 
-    circuit.display();
+    circuit.show();
 
     qs::Results results = circuit.run(1000);
 
-    results.display();
+    results.show();
 
     return 0;
 }

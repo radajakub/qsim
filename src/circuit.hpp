@@ -56,8 +56,8 @@ namespace qs {
         // run the experiment and report results
         Results run(int shots);
 
-        // display the circuit based on if it was compiled or not
-        void display();
+        // show the circuit based on if it was compiled or not
+        void show();
     };
 
     class Outcome {
@@ -74,7 +74,7 @@ namespace qs {
 
         void add_p(double p);
 
-        void display();
+        void show();
     };
 
     class Results {
@@ -86,7 +86,7 @@ namespace qs {
 
         void add_outcome(std::string &bits, double p);
 
-        void display();
+        void show();
     };
 };
 

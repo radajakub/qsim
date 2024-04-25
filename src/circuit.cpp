@@ -185,7 +185,7 @@ qs::Results qs::Circuit::run(int shots) {
     return results;
 }
 
-void qs::Circuit::display() {
+void qs::Circuit::show() {
     if (!this->compiled) {
         std::cout << "Circuit is not compiled" << std::endl;
         std::cout << "Qubits:" << std::endl;
@@ -227,8 +227,8 @@ void qs::Outcome::add_p(double p) {
     this->p += p;
 }
 
-void qs::Outcome::display() {
-    std::cout << "[p=" << this->p << "] : " << this->bits;
+void qs::Outcome::show() {
+    std::cout << this->bits << " [p=" << this->p << "]" << std::endl;
 }
 
 void qs::Results::add_outcome(std::string &bits, double p) {
@@ -238,11 +238,10 @@ void qs::Results::add_outcome(std::string &bits, double p) {
     this->outcomes[bits].add_p(p);
 }
 
-void qs::Results::display() {
+void qs::Results::show() {
     std::cout << "Outcomes with probability:" << std::endl;
     for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
         qs::Outcome outcome = key_val.second;
-        outcome.display();
-        std::cout << std::endl;
+        outcome.show();
     }
 }
