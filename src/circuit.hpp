@@ -1,7 +1,9 @@
 #ifndef __CIRCUIT_HPP__
 #define __CIRCUIT_HPP__
 
+#include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "qubit.hpp"
@@ -10,6 +12,7 @@
 namespace qs {
     class Circuit;
     class Results;
+    class Outcome;
 
     class Circuit {
     private:
@@ -23,6 +26,8 @@ namespace qs {
         bool compiled;
         Ket full_qubit;
         Unitary full_gate;
+        std::vector<int> measured_qubits;
+        std::vector<int> nonmeasured_qubits;
 
     public:
         Circuit(std::vector<Ket> &qubits) : Circuit(qubits, qubits.size()){};
@@ -39,7 +44,10 @@ namespace qs {
         // insert controlled gate with control and target qubits
         void cgate(Unitary gate, int control, int target);
 
+        // add measurement of qubit into classical bit
         void measure(int qubit, int bit);
+
+        void _generate_projections(std::vector<std::vector<BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis = {});
 
         // compile the gates into one
         void compile();
@@ -51,8 +59,32 @@ namespace qs {
         void display();
     };
 
-    class Results {
+    class Outcome {
     public:
+        Outcome(){};
+        Outcome(std::string &bits) : bits(bits), p(0.0){};
+
+        static std::string get_bits(std::vector<BasicQubits> &basis, std::vector<int> &measured_qubits, std::vector<int> &measurement_mapping);
+
+        // outcome is a list of classical bits measured with a probability distribution
+        std::string bits;
+        // probability of measuring 1
+        double p;
+
+        void add_p(double p);
+
+        void display();
+    };
+
+    class Results {
+    private:
+        std::unordered_map<std::string, Outcome> outcomes;
+
+    public:
+        Results(){};
+
+        void add_outcome(std::string &bits, double p);
+
         void display();
     };
 };

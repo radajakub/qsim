@@ -133,6 +133,14 @@ void qs::Circuit::measure(int qubit, int bit) {
         exit(1);
     }
 
+    // check if the classical bit was already assigned
+    for (int i = 0; i < this->n_qubits; ++i) {
+        if (this->measurement_mapping[i] == bit) {
+            std::cerr << "measure: classical bit is already assigned to another qubit" << std::endl;
+            exit(1);
+        }
+    }
+
     this->measurement_mapping[qubit] = bit;
 }
 
@@ -158,7 +166,50 @@ void qs::Circuit::compile() {
         this->full_gate = this->full_gate % this->gates[i];
     }
 
+    bool all_classical_used = true;
+    for (int bit = 0; bit < this->n_bits; ++bit) {
+        bool found = false;
+        for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
+            if (this->measurement_mapping[qubit] == bit) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            all_classical_used = false;
+            break;
+        }
+    }
+
+    if (!all_classical_used) {
+        std::cerr << "compile: not all classical bits are used, either remove the extra ones or use them for some qubit" << std::endl;
+        exit(1);
+    }
+
+    this->measured_qubits.resize(0);
+    this->nonmeasured_qubits.resize(0);
+    for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
+        if (this->measurement_mapping[qubit] == -1) {
+            this->nonmeasured_qubits.push_back(qubit);
+        } else {
+            this->measured_qubits.push_back(qubit);
+        }
+    }
+
     this->compiled = true;
+}
+
+void qs::Circuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis) {
+    if (basis.size() == n_qubits) {
+        projections.push_back(basis);
+        return;
+    }
+
+    for (qs::BasicQubits &basic_qubit : basic_qubits) {
+        basis.push_back(basic_qubit);
+        qs::Circuit::_generate_projections(projections, basic_qubits, basis);
+        basis.pop_back();
+    }
 }
 
 qs::Results qs::Circuit::run(int shots) {
@@ -170,30 +221,29 @@ qs::Results qs::Circuit::run(int shots) {
     qs::Ket ket_res = this->full_gate * this->full_qubit;
     qs::Bra bra_res = ket_res.conjugate();
 
-    std::cout << "Resulting vector: ";
-    ket_res.vector();
-    std::cout << std::endl;
+    qs::Results results;
 
-    std::cout << "Measuring probabilities: ";
+    // generate all projections
+    std::vector<qs::BasicQubits> basic_qubits = {qs::BasicQubits::ZERO, qs::BasicQubits::ONE};
+    std::vector<std::vector<qs::BasicQubits>> all_projection_bases;
+    qs::Circuit::_generate_projections(all_projection_bases, basic_qubits);
 
-    // for now measure only first qubit for two qubit system
-    double p0 = 0;
-    qs::Unitary proj00 = qs::Proj({qs::BasicQubits::ZERO, qs::BasicQubits::ZERO});
-    qs::Unitary proj01 = qs::Proj({qs::BasicQubits::ZERO, qs::BasicQubits::ONE});
+    // for every projection basis
+    for (std::vector<qs::BasicQubits> &projection_basis : all_projection_bases) {
+        // compute projection matrix
+        qs::Unitary proj = qs::Proj(projection_basis);
+        // compute probability of measurement
+        double p = (bra_res * proj * ket_res).magnitude();
 
-    p0 += (bra_res * proj00 * ket_res).magnitude();
-    p0 += (bra_res * proj01 * ket_res).magnitude();
-    std::cout << "P(0) = " << p0 << std::endl;
+        // determine bits of measured qubit
+        std::string bits = qs::Outcome::get_bits(projection_basis, this->measured_qubits, this->measurement_mapping);
 
-    double p1 = 0;
-    qs::Unitary proj10 = qs::Proj({qs::BasicQubits::ONE, qs::BasicQubits::ZERO});
-    qs::Unitary proj11 = qs::Proj({qs::BasicQubits::ONE, qs::BasicQubits::ONE});
+        std::cout << bits << " " << p << std::endl;
 
-    p1 += (bra_res * proj10 * ket_res).magnitude();
-    p1 += (bra_res * proj11 * ket_res).magnitude();
-    std::cout << "P(1) = " << p1 << std::endl;
+        results.add_outcome(bits, p);
+    }
 
-    return qs::Results();
+    return results;
 }
 
 void qs::Circuit::display() {
@@ -222,6 +272,38 @@ void qs::Circuit::display() {
         std::cout << std::endl;
         std::cout << "Full gate:" << std::endl;
         this->full_gate.matrix();
+        std::cout << std::endl;
+    }
+}
+
+std::string qs::Outcome::get_bits(std::vector<qs::BasicQubits> &basis, std::vector<int> &measured_qubits, std::vector<int> &measurement_mapping) {
+    std::string bits(measured_qubits.size(), '-');
+    for (int m : measured_qubits) {
+        bits[measurement_mapping[m]] = basis[m];
+    }
+    return bits;
+}
+
+void qs::Outcome::add_p(double p) {
+    this->p += p;
+}
+
+void qs::Outcome::display() {
+    std::cout << "[p=" << this->p << "] : " << this->bits;
+}
+
+void qs::Results::add_outcome(std::string &bits, double p) {
+    if (this->outcomes.find(bits) == this->outcomes.end()) {
+        this->outcomes[bits] = Outcome(bits);
+    }
+    this->outcomes[bits].add_p(p);
+}
+
+void qs::Results::display() {
+    std::cout << "Outcomes with probability:" << std::endl;
+    for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
+        qs::Outcome outcome = key_val.second;
+        outcome.display();
         std::cout << std::endl;
     }
 }
