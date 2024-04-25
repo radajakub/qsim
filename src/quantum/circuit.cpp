@@ -1,6 +1,6 @@
 #include "./circuit.hpp"
 
-qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
+qs::QuantumCircuit::QuantumCircuit(std::vector<Ket> &qubits, int n_bits) {
     qs::check_err(qubits.size() != n_bits, "circuit", "vector dimension mismatch");
 
     this->compiled = false;
@@ -12,7 +12,7 @@ qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
     this->measurement_mapping = std::vector<int>(this->n_qubits, -1);
 }
 
-qs::Circuit::Circuit(int n_qubits, int n_bits, BasicQubits basis) {
+qs::QuantumCircuit::QuantumCircuit(int n_qubits, int n_bits, BasicQubits basis) {
     this->compiled = false;
 
     this->n_qubits = n_qubits;
@@ -22,7 +22,7 @@ qs::Circuit::Circuit(int n_qubits, int n_bits, BasicQubits basis) {
     this->measurement_mapping = std::vector<int>(this->n_qubits, -1);
 }
 
-void qs::Circuit::gate(qs::Unitary gate, int qubit) {
+void qs::QuantumCircuit::gate(qs::Unitary gate, int qubit) {
     qs::check_range("gate", qubit, this->n_qubits);
     qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
 
@@ -31,7 +31,7 @@ void qs::Circuit::gate(qs::Unitary gate, int qubit) {
     this->gates.push_back(qs::tensor_reduce(sub_gates));
 }
 
-void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
+void qs::QuantumCircuit::gate(qs::Unitary gate, std::vector<int> qubits) {
     for (int qubit : qubits) {
         qs::check_range("gate", qubit, this->n_qubits);
         qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
@@ -44,7 +44,7 @@ void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
     this->gates.push_back(qs::tensor_reduce(sub_gates));
 }
 
-void qs::Circuit::gate(qs::Unitary gate) {
+void qs::QuantumCircuit::gate(qs::Unitary gate) {
     for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
         qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
     }
@@ -53,7 +53,7 @@ void qs::Circuit::gate(qs::Unitary gate) {
     this->gates.push_back(qs::tensor_reduce(sub_gates));
 }
 
-void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
+void qs::QuantumCircuit::cgate(qs::Unitary gate, int control, int target) {
     qs::check_range("cgate", control, this->n_qubits);
     qs::check_range("cgate", target, this->n_qubits);
     qs::check_err(this->measurement_mapping[control] != -1, "cgate", "control qubit is already measured");
@@ -83,7 +83,7 @@ void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
     this->gates.push_back(result);
 }
 
-void qs::Circuit::measure(int qubit, int bit) {
+void qs::QuantumCircuit::measure(int qubit, int bit) {
     qs::check_range("measure [qubit]", qubit, this->n_qubits);
     qs::check_range("measure [bit]", bit, this->n_bits);
 
@@ -95,7 +95,7 @@ void qs::Circuit::measure(int qubit, int bit) {
     this->measurement_mapping[qubit] = bit;
 }
 
-void qs::Circuit::compile() {
+void qs::QuantumCircuit::compile() {
     if (this->compiled) {
         return;
     }
@@ -141,7 +141,7 @@ void qs::Circuit::compile() {
     this->compiled = true;
 }
 
-void qs::Circuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis) {
+void qs::QuantumCircuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis) {
     if (basis.size() == n_qubits) {
         projections.push_back(basis);
         return;
@@ -149,12 +149,12 @@ void qs::Circuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>
 
     for (qs::BasicQubits &basic_qubit : basic_qubits) {
         basis.push_back(basic_qubit);
-        qs::Circuit::_generate_projections(projections, basic_qubits, basis);
+        qs::QuantumCircuit::_generate_projections(projections, basic_qubits, basis);
         basis.pop_back();
     }
 }
 
-qs::Results qs::Circuit::run(int shots) {
+qs::Results qs::QuantumCircuit::run(int shots) {
     qs::check_err(!this->compiled, "run", "circuit was not compiled");
 
     qs::Ket ket_res = this->full_gate * this->full_qubit;
@@ -165,7 +165,7 @@ qs::Results qs::Circuit::run(int shots) {
     // generate all projections
     std::vector<qs::BasicQubits> basic_qubits = {qs::BasicQubits::ZERO, qs::BasicQubits::ONE};
     std::vector<std::vector<qs::BasicQubits>> all_projection_bases;
-    qs::Circuit::_generate_projections(all_projection_bases, basic_qubits);
+    qs::QuantumCircuit::_generate_projections(all_projection_bases, basic_qubits);
 
     // for every projection basis
     for (std::vector<qs::BasicQubits> &projection_basis : all_projection_bases) {
@@ -185,7 +185,7 @@ qs::Results qs::Circuit::run(int shots) {
     return results;
 }
 
-void qs::Circuit::show() {
+void qs::QuantumCircuit::show() {
     if (!this->compiled) {
         std::cout << "Circuit is not compiled" << std::endl;
         std::cout << "Qubits:" << std::endl;

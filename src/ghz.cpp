@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]) {
     // initialize qubits to |0>
-    qs::Circuit circuit(3, 3, qs::BasicQubits::ZERO);
+    qs::QuantumCircuit circuit(3, 3, qs::BasicQubits::ZERO);
 
     // apply Hadamard gate to qubit 0
     circuit.gate(qs::Hadamard(), 0);

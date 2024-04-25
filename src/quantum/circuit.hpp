@@ -13,11 +13,11 @@
 #include "./unitary.hpp"
 
 namespace qs {
-    class Circuit;
+    class QuantumCircuit;
     class Results;
     class Outcome;
 
-    class Circuit {
+    class QuantumCircuit {
     private:
         int n_qubits;
         int n_bits;
@@ -38,10 +38,10 @@ namespace qs {
         std::vector<int> measured_qubits;
 
     public:
-        Circuit(std::vector<Ket> &qubits) : Circuit(qubits, qubits.size()){};
-        Circuit(std::vector<Ket> &qubits, int n_bits);
-        Circuit(int n_qubits, BasicQubits basis = BasicQubits::ZERO) : Circuit(n_qubits, n_qubits, basis){};
-        Circuit(int n_qubits, int n_bits, BasicQubits basis = BasicQubits::ZERO);
+        QuantumCircuit(std::vector<Ket> &qubits) : QuantumCircuit(qubits, qubits.size()){};
+        QuantumCircuit(std::vector<Ket> &qubits, int n_bits);
+        QuantumCircuit(int n_qubits, BasicQubits basis = BasicQubits::ZERO) : QuantumCircuit(n_qubits, n_qubits, basis){};
+        QuantumCircuit(int n_qubits, int n_bits, BasicQubits basis = BasicQubits::ZERO);
 
         // insert gate for a single qubit
         void gate(Unitary gate, int qubit);
