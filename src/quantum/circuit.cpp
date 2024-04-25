@@ -232,6 +232,11 @@ void qs::Outcome::show() {
 }
 
 void qs::Results::add_outcome(std::string &bits, double p) {
+    // ignore outcomes that have zero probability
+    if (p == 0) {
+        return;
+    }
+    // add the outcome or increase its probability
     if (this->outcomes.find(bits) == this->outcomes.end()) {
         this->outcomes[bits] = Outcome(bits);
     }
