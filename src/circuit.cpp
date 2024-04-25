@@ -1,10 +1,7 @@
 #include "circuit.hpp"
 
 qs::Circuit::Circuit(std::vector<Ket> &qubits, int n_bits) {
-    if (qubits.size() == 0) {
-        std::cerr << "_add: vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_err(qubits.size() != n_bits, "circuit", "vector dimension mismatch");
 
     this->compiled = false;
 
@@ -26,15 +23,8 @@ qs::Circuit::Circuit(int n_qubits, int n_bits, BasicQubits basis) {
 }
 
 void qs::Circuit::gate(qs::Unitary gate, int qubit) {
-    if (qubit >= this->n_qubits || qubit < 0) {
-        std::cerr << "gate: qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-        exit(1);
-    }
-
-    if (this->measurement_mapping[qubit] != -1) {
-        std::cerr << "gate: qubit is already measured" << std::endl;
-        exit(1);
-    }
+    qs::check_range("gate", qubit, this->n_qubits);
+    qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
 
     std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, qs::Identity());
     sub_gates[qubit] = gate;
@@ -43,15 +33,8 @@ void qs::Circuit::gate(qs::Unitary gate, int qubit) {
 
 void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
     for (int qubit : qubits) {
-        if (qubit >= this->n_qubits || qubit < 0) {
-            std::cerr << "gate: qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-            exit(1);
-        }
-
-        if (this->measurement_mapping[qubit] != -1) {
-            std::cerr << "gate: qubit is already measured" << std::endl;
-            exit(1);
-        }
+        qs::check_range("gate", qubit, this->n_qubits);
+        qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
     }
 
     std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, qs::Identity());
@@ -63,10 +46,7 @@ void qs::Circuit::gate(qs::Unitary gate, std::vector<int> qubits) {
 
 void qs::Circuit::gate(qs::Unitary gate) {
     for (int qubit = 0; qubit < this->n_qubits; ++qubit) {
-        if (this->measurement_mapping[qubit] != -1) {
-            std::cerr << "gate: qubit is already measured" << std::endl;
-            exit(1);
-        }
+        qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
     }
 
     std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, gate);
@@ -74,30 +54,11 @@ void qs::Circuit::gate(qs::Unitary gate) {
 }
 
 void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
-    if (control >= this->n_qubits || control < 0) {
-        std::cerr << "cgate: control qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-        exit(1);
-    }
-
-    if (target >= this->n_qubits || target < 0) {
-        std::cerr << "cgate: target qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-        exit(1);
-    }
-
-    if (control == target) {
-        std::cerr << "cgate: control and target qubits are the same" << std::endl;
-        exit(1);
-    }
-
-    if (this->measurement_mapping[control] != -1) {
-        std::cerr << "cgate: control qubit is already measured" << std::endl;
-        exit(1);
-    }
-
-    if (this->measurement_mapping[target] != -1) {
-        std::cerr << "cgate: target qubit is already measured" << std::endl;
-        exit(1);
-    }
+    qs::check_range("cgate", control, this->n_qubits);
+    qs::check_range("cgate", target, this->n_qubits);
+    qs::check_err(this->measurement_mapping[control] != -1, "cgate", "control qubit is already measured");
+    qs::check_err(this->measurement_mapping[target] != -1, "cgate", "target qubit is already measured");
+    qs::check_err(control == target, "cgate", "control and target qubits are the samed");
 
     qs::Unitary proj0 = qs::Proj(qs::BasicQubits::ZERO);
     qs::Unitary proj1 = qs::Proj(qs::BasicQubits::ONE);
@@ -123,22 +84,12 @@ void qs::Circuit::cgate(qs::Unitary gate, int control, int target) {
 }
 
 void qs::Circuit::measure(int qubit, int bit) {
-    if (qubit >= this->n_qubits || qubit < 0) {
-        std::cerr << "measure: qubit index out of range [0," << this->n_qubits - 1 << "]" << std::endl;
-        exit(1);
-    }
-
-    if (bit >= this->n_bits || bit < 0) {
-        std::cerr << "measure: bit index out of range [0," << this->n_bits - 1 << "]" << std::endl;
-        exit(1);
-    }
+    qs::check_range("measure [qubit]", qubit, this->n_qubits);
+    qs::check_range("measure [bit]", bit, this->n_bits);
 
     // check if the classical bit was already assigned
     for (int i = 0; i < this->n_qubits; ++i) {
-        if (this->measurement_mapping[i] == bit) {
-            std::cerr << "measure: classical bit is already assigned to another qubit" << std::endl;
-            exit(1);
-        }
+        qs::check_err(this->measurement_mapping[i] == bit, "measure", "classical bit is already assigned to another qubit");
     }
 
     this->measurement_mapping[qubit] = bit;
@@ -151,10 +102,7 @@ void qs::Circuit::compile() {
 
     int n = this->gates.size();
 
-    if (n == 0) {
-        std::cerr << "compile: no gates to compile" << std::endl;
-        exit(1);
-    }
+    qs::check_err(n == 0, "compile", "no gates to compile");
 
     // reduce qubits into one qubit
     this->full_qubit = qs::tensor_reduce(this->qubits);
@@ -181,10 +129,7 @@ void qs::Circuit::compile() {
         }
     }
 
-    if (!all_classical_used) {
-        std::cerr << "compile: not all classical bits are used, either remove the extra ones or use them for some qubit" << std::endl;
-        exit(1);
-    }
+    qs::check_err(!all_classical_used, "compile", "not all classical bits are used, either remove the extra ones or use them for some qubit");
 
     this->measured_qubits.resize(0);
     this->nonmeasured_qubits.resize(0);
@@ -213,10 +158,7 @@ void qs::Circuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>
 }
 
 qs::Results qs::Circuit::run(int shots) {
-    if (!this->compiled) {
-        std::cerr << "run: circuit was not compiled" << std::endl;
-        exit(1);
-    }
+    qs::check_err(!this->compiled, "run", "circuit was not compiled");
 
     qs::Ket ket_res = this->full_gate * this->full_qubit;
     qs::Bra bra_res = ket_res.conjugate();
@@ -234,12 +176,9 @@ qs::Results qs::Circuit::run(int shots) {
         qs::Unitary proj = qs::Proj(projection_basis);
         // compute probability of measurement
         double p = (bra_res * proj * ket_res).magnitude();
-
         // determine bits of measured qubit
         std::string bits = qs::Outcome::get_bits(projection_basis, this->measured_qubits, this->measurement_mapping);
-
-        std::cout << bits << " " << p << std::endl;
-
+        // add the outcome or increase its probability
         results.add_outcome(bits, p);
     }
 

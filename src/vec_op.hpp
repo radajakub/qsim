@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "complex.hpp"
+#include "err.hpp"
 
 // NOTE: consider only square matrices
 namespace qs {

@@ -1,10 +1,7 @@
 #include "vec_op.hpp"
 
 qs::c_vec qs::_add(qs::c_vec& a, qs::c_vec& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_add: vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_add [vector]", a.size(), b.size());
 
     int dim = a.size();
 
@@ -15,10 +12,7 @@ qs::c_vec qs::_add(qs::c_vec& a, qs::c_vec& b) {
 }
 
 qs::c_vec qs::_sub(qs::c_vec& a, qs::c_vec& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_sub: vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_sub [vector]", a.size(), b.size());
 
     int dim = a.size();
 
@@ -47,10 +41,7 @@ qs::c_vec qs::_conjugate(qs::c_vec& a) {
 }
 
 qs::c_mat qs::_add(qs::c_mat& a, qs::c_mat& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_add: matrix dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_add [matrix]", a.size(), b.size());
 
     int dim = a.size();
 
@@ -62,10 +53,7 @@ qs::c_mat qs::_add(qs::c_mat& a, qs::c_mat& b) {
 }
 
 qs::c_mat qs::_sub(qs::c_mat& a, qs::c_mat& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_sub: matrix dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_sub [matrix]", a.size(), b.size());
 
     int dim = a.size();
 
@@ -97,10 +85,7 @@ qs::c_mat qs::_dagger(qs::c_mat& a) {
 }
 
 qs::c_vec qs::_matvecmul(qs::c_mat& m, qs::c_vec& x) {
-    if (m.size() != x.size()) {
-        std::cerr << "_matvecmul: matrix vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_matvecmul", m.size(), x.size());
 
     int dim = m.size();
     qs::c_vec res(dim);
@@ -114,10 +99,7 @@ qs::c_vec qs::_matvecmul(qs::c_mat& m, qs::c_vec& x) {
 }
 
 qs::c_vec qs::_vecmatmul(qs::c_vec& x, qs::c_mat& m) {
-    if (m.size() != x.size()) {
-        std::cerr << "_vecmatmul: vector matrix dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_vecmatmul", m.size(), x.size());
 
     int dim = m.size();
     qs::c_vec res(dim);
@@ -131,10 +113,7 @@ qs::c_vec qs::_vecmatmul(qs::c_vec& x, qs::c_mat& m) {
 }
 
 qs::c_mat qs::_matmul(qs::c_mat& a, qs::c_mat& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_matmul: matrix dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_matmul", a.size(), b.size());
 
     int dim = a.size();
     qs::c_mat res(dim, qs::c_vec(dim));
@@ -150,10 +129,7 @@ qs::c_mat qs::_matmul(qs::c_mat& a, qs::c_mat& b) {
 }
 
 qs::Complex qs::_inner(c_vec& a, c_vec& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_inner: vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_inner", a.size(), b.size());
 
     int dim = a.size();
     qs::Complex res;
@@ -165,10 +141,7 @@ qs::Complex qs::_inner(c_vec& a, c_vec& b) {
 }
 
 qs::c_mat qs::_outer(c_vec& a, c_vec& b) {
-    if (a.size() != b.size()) {
-        std::cerr << "_outer: vector dimension mismatch" << std::endl;
-        exit(1);
-    }
+    qs::check_dims("_outer", a.size(), b.size());
 
     int dim = a.size();
     qs::c_mat res(dim, qs::c_vec(dim));
