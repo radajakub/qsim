@@ -18,7 +18,7 @@ namespace qs {
     class Outcome;
 
     class QuantumCircuit {
-    private:
+    protected:
         int n_qubits;
         int n_bits;
         // list of intial qubits in the circuit
@@ -51,6 +51,8 @@ namespace qs {
         void gate(Unitary gate);
         // insert controlled gate with control and target qubits
         void cgate(Unitary gate, int control, int target);
+        // insert oracle converted into a gate
+        void oracle(qs::QuantumCircuit oracle);
 
         // add measurement of qubit into classical bit
         void measure(int qubit, int bit);
@@ -61,11 +63,24 @@ namespace qs {
         // prepare the initial qubits and gates for the computation
         void compile();
 
+        // convert the circuit into a gate
+        Unitary to_gate();
+
         // run the experiment
         Results run(int shots);
 
         // show the circuit based on if it was compiled or not
         void show();
+    };
+
+    class ConstantOracle : public QuantumCircuit {
+    public:
+        ConstantOracle(int n_qubits, int output);
+    };
+
+    class BalancedOracle : public QuantumCircuit {
+    public:
+        BalancedOracle(int n_qubits);
     };
 
     class Outcome {

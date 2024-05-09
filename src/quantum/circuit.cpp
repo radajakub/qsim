@@ -83,6 +83,12 @@ void qs::QuantumCircuit::cgate(qs::Unitary gate, int control, int target) {
     this->gates.push_back(result);
 }
 
+void qs::QuantumCircuit::oracle(qs::QuantumCircuit oracle) {
+    qs::check_err(oracle.n_qubits != this->n_qubits, "oracle", "oracle dimension mismatch");
+
+    this->gates.push_back(oracle.to_gate());
+}
+
 void qs::QuantumCircuit::measure(int qubit, int bit) {
     qs::check_range("measure [qubit]", qubit, this->n_qubits);
     qs::check_range("measure [bit]", bit, this->n_bits);
@@ -139,6 +145,19 @@ void qs::QuantumCircuit::compile() {
     }
 
     this->compiled = true;
+}
+
+qs::Unitary qs::QuantumCircuit::to_gate() {
+    qs::check_err(this->gates.empty(), "to_gate", "circuit has no gates");
+
+    int n = this->gates.size();
+    this->full_gate = this->gates[n - 1];
+
+    for (int i = n - 2; i >= 0; --i) {
+        this->full_gate = this->full_gate % this->gates[i];
+    }
+
+    return this->full_gate;
 }
 
 void qs::QuantumCircuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis) {
@@ -229,6 +248,28 @@ void qs::Outcome::add_p(double p) {
 
 void qs::Outcome::show() {
     std::cout << this->bits << " [p=" << this->p << "]" << std::endl;
+}
+
+qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : QuantumCircuit(n_qubits) {
+    qs::check_err(output != 0 && output != 1, "ConstantOracle", "Invalid output specified. Must be either 0 or 1");
+
+    this->n_qubits = n_qubits;
+    this->n_bits = 0;
+
+    this->gate(qs::Identity());
+
+    if (output == 1) {
+        this->gate(qs::PauliX(), n_qubits - 1);
+    }
+}
+
+qs::BalancedOracle::BalancedOracle(int n_qubits) : QuantumCircuit(n_qubits) {
+    this->n_qubits = n_qubits;
+    this->n_bits = 0;
+
+    for (int i = 0; i < n_qubits - 1; ++i) {
+        this->cgate(qs::PauliX(), i, n_qubits - 1);
+    }
 }
 
 qs::Results::Results(int shots) {
