@@ -60,14 +60,17 @@ int main(int argc, char* argv[]) {
         circuit.measure(i, i);
     }
 
-    circuit.show();
-
     // compile the circuit
     circuit.compile();
 
     // run the circuit
     qs::Results results = circuit.run(1024);
     results.show_counts();
+
+    // analyse measurements to see if function is balanced or constant
+    std::string constant_outcome(n, '0');
+    double constant_prob = results.get_measured_ratio(constant_outcome);
+    std::cout << "Function is " << (constant_prob > 0.5 ? "CONSTANT" : "BALANCED") << std::endl;
 
     return 0;
 }

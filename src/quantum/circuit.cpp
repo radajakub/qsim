@@ -291,6 +291,15 @@ void qs::Results::add_outcome(std::string &bits, double p) {
     this->outcomes[bits].add_p(p);
 }
 
+double qs::Results::get_measured_ratio(std::string &bits) {
+    // the outcome was not sampled at all
+    if (this->counts.find(bits) == this->counts.end()) {
+        return 0.0;
+    }
+    // return the ratio of this bit string
+    return (double)this->counts[bits] / this->shots;
+}
+
 void qs::Results::run() {
     // reset the counts to zeros for each possible outcome
     this->counts.clear();
@@ -322,6 +331,7 @@ void qs::Results::show_outcomes() {
 }
 
 void qs::Results::show_counts() {
+    std::cout << "Measurements: " << std::endl;
     int line_width = 100;
     double unit = (double)line_width / this->shots;
     int count;
@@ -340,4 +350,5 @@ void qs::Results::show_counts() {
         percent = (double)count / this->shots * 100;
         std::cout << bits << " |" << meter << rest << "| " << percent << "% (" << count << "/" << this->shots << ")" << std::endl;
     }
+    std::cout << std::endl;
 }

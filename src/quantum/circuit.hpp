@@ -116,6 +116,8 @@ namespace qs {
 
         void add_outcome(std::string &bits, double p);
 
+        double get_measured_ratio(std::string &bits);
+
         void run();
 
         void show_outcomes();
