@@ -320,7 +320,6 @@ qs::BalancedOracle::BalancedOracle(int n_qubits) : qs::QuantumCircuit(n_qubits) 
 }
 
 qs::SimonOracle::SimonOracle(std::string s) : qs::QuantumCircuit(2 * s.size()) {
-    std::cout << "Building Simon Oracle" << std::endl;
     int n = s.size();
     int two_n = (int)pow(2, n);
     int four_n = (int)pow(4, n);
@@ -364,6 +363,14 @@ void qs::Results::add_outcome(std::string &bits, double p) {
         this->outcomes[bits] = Outcome(bits);
     }
     this->outcomes[bits].add_p(p);
+}
+
+std::vector<std::string> qs::Results::get_bits() {
+    std::vector<std::string> bits;
+    for (const std::pair<const std::string, qs::Outcome> &key_val : this->outcomes) {
+        bits.push_back(key_val.first);
+    }
+    return bits;
 }
 
 double qs::Results::get_measured_ratio(std::string &bits) {

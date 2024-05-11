@@ -124,6 +124,8 @@ namespace qs {
 
         void add_outcome(std::string &bits, double p);
 
+        std::vector<std::string> get_bits();
+
         double get_measured_ratio(std::string &bits);
 
         void run();

@@ -1,9 +1,36 @@
 #include <cstring>
 #include <iostream>
+#include <string>
+#include <vector>
 
+#include "./lib/gem.hpp"
 #include "./quantum/circuit.hpp"
 #include "./quantum/unitary.hpp"
 #include "./utils/err.hpp"
+
+std::vector<std::string> get_secrets(qs::Results& results) {
+    std::vector<std::string> outcomes = results.get_bits();
+
+    int cols = outcomes.size();
+    int rows = outcomes[0].size();
+
+    qs::b_mat mat = qs::_augmented_matrix(outcomes, rows, cols);
+
+    qs::_row_echelon(mat, rows, cols);
+
+    std::vector<qs::b_vec> bits = qs::_extract(mat, rows, cols);
+
+    std::vector<std::string> secrets;
+    for (int i = 0; i < bits.size(); ++i) {
+        std::string s;
+        for (int j = 0; j < bits[i].size(); ++j) {
+            s += std::to_string(bits[i][j]);
+        }
+        secrets.push_back(s);
+    }
+
+    return secrets;
+}
 
 int main(int argc, char* argv[]) {
     qs::check_err(argc % 2 == 0, "main", "Invalid number of arguments");
@@ -61,17 +88,31 @@ int main(int argc, char* argv[]) {
     // compile the circuit
     circuit.compile();
 
-    circuit.show();
-    std::cout << std::endl;
+    // circuit.show();
+    // std::cout << std::endl;
 
     // run the circuit
     qs::Results results = circuit.run(shots, verbose);
-    std::cout << std::endl;
 
     results.show_outcomes();
     std::cout << std::endl;
 
     results.show_counts();
+
+    std::vector<std::string> outcomes = get_secrets(results);
+
+    for (std::string& outcome : outcomes) {
+        std::cout << "secret: " << outcome;
+        if (outcome == s) {
+            std::cout << " (correct)";
+        }
+        if (outcome == std::string(outcome.size(), '0')) {
+            std::cout << " THE FUNCTION IS ONE TO ONE";
+        } else {
+            std::cout << " THE FUNCTION IS TWO TO ONE";
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
