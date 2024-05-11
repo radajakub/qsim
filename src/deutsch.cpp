@@ -81,6 +81,8 @@ int main(int argc, char* argv[]) {
 
     // run the circuit
     qs::Results results = circuit.run(shots, verbose);
+
+    std::cout << std::endl;
     results.show_counts();
 
     // analyse measurements to see if function is balanced or constant
