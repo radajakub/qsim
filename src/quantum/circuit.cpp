@@ -184,7 +184,7 @@ qs::Results qs::QuantumCircuit::run(int shots) {
     int k = 0;
     for (qs::Unitary &gate : this->gates) {
         if (gate.dim == 0) {
-            std::cout << "(" << k << ") ";
+            std::cout << "(" << k++ << ") ";
             ket_res.vector();
             std::cout << std::endl;
             continue;
