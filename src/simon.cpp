@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     // parse command-line arguments
     for (int i = 1; i < argc; ++i) {
-        if (std::strcmp(argv[i], "--s") == 0) {
+        if (std::strcmp(argv[i], "--secret") == 0) {
             s = argv[++i];
         } else if (std::strcmp(argv[i], "--verbose") == 0) {
             verbose = std::stoi(argv[++i]);
@@ -70,7 +70,6 @@ int main(int argc, char* argv[]) {
 
     // apply oracle
     qs::SimonOracle oracle(s);
-    oracle.show();
     circuit.oracle(oracle);
 
     circuit.barrier();
@@ -88,15 +87,18 @@ int main(int argc, char* argv[]) {
     // compile the circuit
     circuit.compile();
 
+    // print the circuit after compilation
     // circuit.show();
     // std::cout << std::endl;
 
     // run the circuit
     qs::Results results = circuit.run(shots, verbose);
 
-    results.show_outcomes();
-    std::cout << std::endl;
+    // shows probability distribution over outcomes
+    // results.show_outcomes();
+    // std::cout << std::endl;
 
+    // shows results of multiple measurements
     results.show_counts();
 
     std::vector<std::string> outcomes = guess_secrets(results);

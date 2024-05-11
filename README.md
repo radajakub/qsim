@@ -84,6 +84,11 @@ More specifically:
 
 We can also add a controlled gate (with single control qubit for now) by the function `curcuit.cgate(Unitary gate, int control, int qubit)`, where `control` and `qubit` must be different.
 
+For algorithms which use an oracle of some sort (e.g. Deutsch, Simon) there is a method `circuit.oracle(QuantumCircuit oracle)`, which takes a quantum circuit and by a method `to_gate()` converts it to a unitary gate and adds it to the circuit.
+There are three oracles prepared `BalancedOracle(int n_qubits)`, `ConstantOracle(int n_qubits, int output)` and `SimonOracle(std::string secret)` for use in the Deutsch algorithm and Simon's algorithm.
+
+Moreover, there is a special gate `Barrier()`  which is added to the circuit by `circuit.barrier()` and which does no manipulation on the qubits.
+It serves as a checkpoint for printing the current state of the qubits when the program is run in verbose mode.
 
 #### Measurements
 After adding all gates, we select which qubits to measure and to which classical bits output the measured values.
@@ -91,8 +96,58 @@ This is done simply by method `circuit.measure(int qubit, int bit)`.
 Note, that after measuring a qubit, no gate can be added which acts on that qubit.
 
 #### Experiments
-After adding all elements to the circuit, we call method `circuit.compile()`.
+After adding all elements to the circuit, we call method `circuit.compile()` which sets measurements and performs some tensor operations before actual experiments.
 After that we call a method `circuit.run(int n_shots)` to run the circuit `n_shots` times and collect the statistics and output a `Results` object.
 To display the results of measurements to the console, use method `results.show_counts()`.
 
 To see a complete and functioning example, see the file `src/ghz.cpp`, which implements preparation and measurement of the GHZ state.
+
+## Algorithms
+
+There are two algorithms implemented in here, the Deutsch algorithm and the Simon's algorithm.
+
+Both algorithms have an option to print the progression of the computation.
+It prints all used gates in tensor product notation and for every `Barrier()` gate, it prints the state of the qubits at that point. This is enabled by an option `--verbose 1` when running the program.
+Note, that for larger inputs, especially the Simon's algorithm whose size scales exponentially, the outputs can be very large.
+However, there is no symbolic manipulation with the qubits, so this is the only option.
+
+### Deutsch algorithm
+
+The implementation of the Deutsch-Josza algorithm can be compiled and run by `make deutsch` and `./deutsch` with some parameters:
+
+- `--type [balanced | constant]` specifies which oracle to use
+  - `--output [0 | 1]` when type is `constant`, it specifies the output of the constant function (default `0`)
+- `--n [n]` the number of qubits (default `1`)
+- `--verbose [0 | 1]` whether to print the progression of the computation (default `0`)
+- `--shots [n]` the number of shots to run the circuit (default `1024`) and compute the occurrence frequencies
+
+For example for `n=1` and `constant` oracle, the call should look like `./deutsch --type constant --output 1 --n 1`.
+
+The output is then presented as a bar graph of obtained outcomes in a fashion similar to this:
+```
+Measurements: 
+0 |##################################################| 100% (1024/1024)
+
+Function is CONSTANT
+```
+
+### Simon's algorithm
+
+The implementation of the Simon's algorithm can be compiled and run by `make simon` and `./simon` with some parameters:
+
+- `--secret [secret]` the secret string for the Simon's algorithm (if it is only `0` the function is one-to-one, otherwise it is two-to-one) whose length also specifies the number of necessary qubits
+- `--verbose [0 | 1]` whether to print the progression of the computation (default `0`)
+- `--shots [n]` the number of shots to run the circuit (default `1024`) and compute the occurrence frequencies
+
+For example for `secret=010`, the call should look like `./simon --secret 010`.
+
+The output is then presented as a bar graph of obtained outcomes in a fashion similar to this and with a predicted secret string:
+```
+Measurements: 
+000 |############......................................| 25.4883% (261/1024)
+001 |###########.......................................| 23.2422% (238/1024)
+101 |#############.....................................| 27.3438% (280/1024)
+100 |###########.......................................| 23.9258% (245/1024)
+
+secret: 010 (correct) THE FUNCTION IS TWO TO ONE
+```

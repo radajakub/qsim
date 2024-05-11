@@ -298,8 +298,6 @@ void qs::Outcome::show() {
 qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : qs::QuantumCircuit(n_qubits) {
     qs::check_err(output != 0 && output != 1, "ConstantOracle", "Invalid output specified. Must be either 0 or 1");
 
-    std::cout << "output " << output << std::endl;
-
     this->n_qubits = n_qubits;
     this->n_bits = 0;
 
@@ -414,7 +412,7 @@ void qs::Results::show_outcomes() {
 
 void qs::Results::show_counts() {
     std::cout << "Measurements: " << std::endl;
-    int line_width = 100;
+    int line_width = 50;
     double unit = (double)line_width / this->shots;
     int count;
     int filled;
