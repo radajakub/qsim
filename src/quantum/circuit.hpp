@@ -69,7 +69,7 @@ namespace qs {
         Unitary to_gate();
 
         // run the experiment
-        Results run(int shots);
+        Results run(int shots, bool verbose = false);
 
         // show the circuit based on if it was compiled or not
         void show();

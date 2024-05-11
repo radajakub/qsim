@@ -11,6 +11,7 @@ int main(int argc, char* argv[]) {
     int n = 1;
     std::string type;
     int output = 0;
+    bool verbose = false;
 
     // parse command-line arguments
     for (int i = 1; i < argc; ++i) {
@@ -22,6 +23,8 @@ int main(int argc, char* argv[]) {
             qs::check_err(type != "constant", "main", "Output is specified onlyt for constant oracle");
             output = std::stoi(argv[++i]);
             qs::check_err(output != 0 && output != 1, "main", "Invalid output specified. Must be either 0 or 1");
+        } else if (std::strcmp(argv[i], "--verbose") == 0) {
+            verbose = std::stoi(argv[++i]);
         } else {
             qs::check_err(true, "main", std::string("Invalid argument: ") + std::string(argv[i]));
         }
@@ -34,13 +37,19 @@ int main(int argc, char* argv[]) {
     // initialize qubits to |0>
     qs::QuantumCircuit circuit(n + 1, n, qs::BasicQubits::ZERO);
 
+    circuit.barrier();
+
     // set ancilla qubit to |1>
     circuit.gate(qs::PauliX(), n);
+
+    circuit.barrier();
 
     // apply Hadamard to every qubit
     std::vector<int> set_qubits(n + 1);
     std::iota(set_qubits.begin(), set_qubits.end(), 0);
     circuit.gate(qs::Hadamard(), set_qubits);
+
+    circuit.barrier();
 
     // add oracle
     if (type == "balanced") {
@@ -51,9 +60,13 @@ int main(int argc, char* argv[]) {
         circuit.oracle(oracle);
     }
 
+    circuit.barrier();
+
     // apply Hadamard to every qubit except the ancilla because we don't need it anymore
     set_qubits.pop_back();
     circuit.gate(qs::Hadamard(), set_qubits);
+
+    circuit.barrier();
 
     // measure all qubits except the ancilla
     for (int i = 0; i < n; ++i) {
@@ -64,7 +77,7 @@ int main(int argc, char* argv[]) {
     circuit.compile();
 
     // run the circuit
-    qs::Results results = circuit.run(1024);
+    qs::Results results = circuit.run(1024, verbose);
     results.show_counts();
 
     // analyse measurements to see if function is balanced or constant

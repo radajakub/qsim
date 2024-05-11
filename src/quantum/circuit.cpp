@@ -150,12 +150,17 @@ qs::Unitary qs::QuantumCircuit::to_gate() {
 
     int n = this->gates.size();
 
-    std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, qs::Identity());
-    qs::Unitary gate = qs::tensor_reduce(sub_gates);
+    qs::Unitary gate;
+    bool first = true;
 
     for (int i = n - 1; i >= 0; --i) {
         if (this->gates[i].dim != 0) {
-            gate = gate % this->gates[i];
+            if (first) {
+                gate = this->gates[i];
+                first = false;
+            } else {
+                gate = gate % this->gates[i];
+            }
         }
     }
 
@@ -175,7 +180,7 @@ void qs::QuantumCircuit::_generate_projections(std::vector<std::vector<qs::Basic
     }
 }
 
-qs::Results qs::QuantumCircuit::run(int shots) {
+qs::Results qs::QuantumCircuit::run(int shots, bool verbose) {
     qs::check_err(!this->compiled, "run", "circuit was not compiled");
 
     qs::Ket ket_res = this->full_qubit;
@@ -183,13 +188,22 @@ qs::Results qs::QuantumCircuit::run(int shots) {
 
     int k = 0;
     for (qs::Unitary &gate : this->gates) {
-        if (gate.dim == 0) {
+        if (verbose) {
             std::cout << "(" << k++ << ") ";
-            ket_res.vector();
-            std::cout << std::endl;
-            continue;
+            if (gate.dim == 0) {
+                std::cout << "Q: ";
+                ket_res.vector();
+                std::cout << std::endl;
+            } else {
+                std::cout << "G: ";
+                gate.symbol();
+                std::cout << std::endl;
+            }
         }
-        ket_res = gate * ket_res;
+
+        if (gate.dim != 0) {
+            ket_res = gate * ket_res;
+        }
     }
 
     qs::Bra bra_res = ket_res.conjugate();
@@ -278,6 +292,8 @@ void qs::Outcome::show() {
 
 qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : QuantumCircuit(n_qubits) {
     qs::check_err(output != 0 && output != 1, "ConstantOracle", "Invalid output specified. Must be either 0 or 1");
+
+    std::cout << "output " << output << std::endl;
 
     this->n_qubits = n_qubits;
     this->n_bits = 0;
