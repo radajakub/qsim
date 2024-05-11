@@ -320,31 +320,30 @@ qs::BalancedOracle::BalancedOracle(int n_qubits) : qs::QuantumCircuit(n_qubits) 
 }
 
 qs::SimonOracle::SimonOracle(std::string s) : qs::QuantumCircuit(2 * s.size()) {
+    std::cout << "Building Simon Oracle" << std::endl;
     int n = s.size();
     int two_n = (int)pow(2, n);
     int four_n = (int)pow(4, n);
 
-    // create random permutation
-    std::mt19937 rng;
-    std::vector<int> perm(two_n);
-    std::iota(perm.begin(), perm.end(), 0);
-    std::shuffle(perm.begin(), perm.end(), rng);
+    qs::QuantumCircuit c(2 * n, n, qs::BasicQubits::ZERO);
 
-    // create matrix of zeros (4n, 4n)
-    int s_int = std::strtol(s.c_str(), nullptr, 2);
+    // copy first n qubits to the second n qubits i.e. |x>|0> -> |x>|x>
+    for (int i = 0; i < n; ++i) {
+        c.cgate(qs::PauliX(), i, i + n);
+    }
 
-    qs::c_mat items = qs::c_mat(four_n, qs::c_vec(four_n, qs::Complex(0)));
-    int t, z;
-    for (int x = 0; x < two_n; ++x) {
-        for (int y = 0; y < two_n; ++y) {
-            t = std::min(x, x ^ s_int);
-            z = y ^ perm[t];
-            items[x + two_n * z][x + two_n * y] = qs::Complex(1);
+    // apply CNOT on first occurence of 1 with positions in the second n qubits where 1 is in the secret string
+    std::size_t flag_bit = s.find('1');
+    if (flag_bit != std::string::npos) {
+        for (int i = 0; i < n; ++i) {
+            if (s[i] == '1') {
+                c.cgate(qs::PauliX(), flag_bit, i + n);
+            }
         }
     }
 
-    qs::Unitary gate(n, items, "Uf");
-    // gate.matrix();
+    qs::Unitary gate = c.to_gate();
+    gate.label = "Uf";
     this->gates.push_back(gate);
 }
 
