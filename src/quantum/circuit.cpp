@@ -290,7 +290,7 @@ void qs::Outcome::show() {
     std::cout << this->bits << " [p=" << this->p << "]" << std::endl;
 }
 
-qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : QuantumCircuit(n_qubits) {
+qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : qs::QuantumCircuit(n_qubits) {
     qs::check_err(output != 0 && output != 1, "ConstantOracle", "Invalid output specified. Must be either 0 or 1");
 
     std::cout << "output " << output << std::endl;
@@ -305,13 +305,42 @@ qs::ConstantOracle::ConstantOracle(int n_qubits, int output) : QuantumCircuit(n_
     }
 }
 
-qs::BalancedOracle::BalancedOracle(int n_qubits) : QuantumCircuit(n_qubits) {
+qs::BalancedOracle::BalancedOracle(int n_qubits) : qs::QuantumCircuit(n_qubits) {
     this->n_qubits = n_qubits;
     this->n_bits = 0;
 
     for (int i = 0; i < n_qubits - 1; ++i) {
         this->cgate(qs::PauliX(), i, n_qubits - 1);
     }
+}
+
+qs::SimonOracle::SimonOracle(std::string s) : qs::QuantumCircuit(2 * s.size()) {
+    int n = s.size();
+    int two_n = (int)pow(2, n);
+    int four_n = (int)pow(4, n);
+
+    // create random permutation
+    std::mt19937 rng;
+    std::vector<int> perm(two_n);
+    std::iota(perm.begin(), perm.end(), 0);
+    std::shuffle(perm.begin(), perm.end(), rng);
+
+    // create matrix of zeros (4n, 4n)
+    int s_int = std::strtol(s.c_str(), nullptr, 2);
+
+    qs::c_mat items = qs::c_mat(four_n, qs::c_vec(four_n, qs::Complex(0)));
+    int t, z;
+    for (int x = 0; x < two_n; ++x) {
+        for (int y = 0; y < two_n; ++y) {
+            t = std::min(x, x ^ s_int);
+            z = y ^ perm[t];
+            items[x + two_n * z][x + two_n * y] = qs::Complex(1);
+        }
+    }
+
+    qs::Unitary gate(n, items, "Uf");
+    // gate.matrix();
+    this->gates.push_back(gate);
 }
 
 qs::Results::Results(int shots) {

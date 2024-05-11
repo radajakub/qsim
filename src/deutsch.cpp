@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
     qs::check_err(argc % 2 == 0, "main", "Invalid number of arguments");
 
     int n = 1;
+    int shots = 1024;
     std::string type;
     int output = 0;
     bool verbose = false;
@@ -19,6 +20,8 @@ int main(int argc, char* argv[]) {
             type = std::string(argv[++i]);
         } else if (std::strcmp(argv[i], "--n") == 0) {
             n = std::stoi(argv[++i]);
+        } else if (std::strcmp(argv[i], "--shots") == 0) {
+            shots = std::stoi(argv[++i]);
         } else if (std::strcmp(argv[i], "--output") == 0) {
             qs::check_err(type != "constant", "main", "Output is specified onlyt for constant oracle");
             output = std::stoi(argv[++i]);
@@ -77,7 +80,7 @@ int main(int argc, char* argv[]) {
     circuit.compile();
 
     // run the circuit
-    qs::Results results = circuit.run(1024, verbose);
+    qs::Results results = circuit.run(shots, verbose);
     results.show_counts();
 
     // analyse measurements to see if function is balanced or constant
