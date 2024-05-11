@@ -8,7 +8,7 @@
 #include "./quantum/unitary.hpp"
 #include "./utils/err.hpp"
 
-std::vector<std::string> get_secrets(qs::Results& results) {
+std::vector<std::string> guess_secrets(qs::Results& results) {
     std::vector<std::string> outcomes = results.get_bits();
 
     int cols = outcomes.size();
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
     results.show_counts();
 
-    std::vector<std::string> outcomes = get_secrets(results);
+    std::vector<std::string> outcomes = guess_secrets(results);
 
     for (std::string& outcome : outcomes) {
         std::cout << "secret: " << outcome;
