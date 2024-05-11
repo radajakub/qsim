@@ -9,7 +9,7 @@ int main(int argc, char* argv[]) {
     qs::check_err(argc % 2 == 0, "main", "Invalid number of arguments");
 
     int n = 1;
-    std::string type = "";
+    std::string type;
     int output = 0;
 
     // parse command-line arguments

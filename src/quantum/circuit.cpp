@@ -22,6 +22,10 @@ qs::QuantumCircuit::QuantumCircuit(int n_qubits, int n_bits, BasicQubits basis) 
     this->measurement_mapping = std::vector<int>(this->n_qubits, -1);
 }
 
+void qs::QuantumCircuit::barrier() {
+    this->gates.push_back(qs::Barrier());
+}
+
 void qs::QuantumCircuit::gate(qs::Unitary gate, int qubit) {
     qs::check_range("gate", qubit, this->n_qubits);
     qs::check_err(this->measurement_mapping[qubit] != -1, "gate", "qubit is already measured");
@@ -113,13 +117,7 @@ void qs::QuantumCircuit::compile() {
     // reduce qubits into one qubit
     this->full_qubit = qs::tensor_reduce(this->qubits);
 
-    // we need to reverse the order
-    // |x>-X-Y-Z => ZYX|x>
-    this->full_gate = this->gates[n - 1];
-    for (int i = n - 2; i >= 0; --i) {
-        this->full_gate = this->full_gate % this->gates[i];
-    }
-
+    // configure measurements
     bool all_classical_used = true;
     for (int bit = 0; bit < this->n_bits; ++bit) {
         bool found = false;
@@ -151,13 +149,17 @@ qs::Unitary qs::QuantumCircuit::to_gate() {
     qs::check_err(this->gates.empty(), "to_gate", "circuit has no gates");
 
     int n = this->gates.size();
-    this->full_gate = this->gates[n - 1];
 
-    for (int i = n - 2; i >= 0; --i) {
-        this->full_gate = this->full_gate % this->gates[i];
+    std::vector<qs::Unitary> sub_gates = std::vector<qs::Unitary>(this->n_qubits, qs::Identity());
+    qs::Unitary gate = qs::tensor_reduce(sub_gates);
+
+    for (int i = n - 1; i >= 0; --i) {
+        if (this->gates[i].dim != 0) {
+            gate = gate % this->gates[i];
+        }
     }
 
-    return this->full_gate;
+    return gate;
 }
 
 void qs::QuantumCircuit::_generate_projections(std::vector<std::vector<qs::BasicQubits>> &projections, std::vector<qs::BasicQubits> &basic_qubits, std::vector<qs::BasicQubits> basis) {
@@ -176,7 +178,20 @@ void qs::QuantumCircuit::_generate_projections(std::vector<std::vector<qs::Basic
 qs::Results qs::QuantumCircuit::run(int shots) {
     qs::check_err(!this->compiled, "run", "circuit was not compiled");
 
-    qs::Ket ket_res = this->full_gate * this->full_qubit;
+    qs::Ket ket_res = this->full_qubit;
+    int n = this->gates.size();
+
+    int k = 0;
+    for (qs::Unitary &gate : this->gates) {
+        if (gate.dim == 0) {
+            std::cout << "(" << k << ") ";
+            ket_res.vector();
+            std::cout << std::endl;
+            continue;
+        }
+        ket_res = gate * ket_res;
+    }
+
     qs::Bra bra_res = ket_res.conjugate();
 
     qs::Results results(shots);
@@ -217,6 +232,10 @@ void qs::QuantumCircuit::show() {
         std::cout << std::endl;
         std::cout << "Gates:" << std::endl;
         for (qs::Unitary &gate : this->gates) {
+            if (gate.dim == 0) {
+                std::cout << "--- barrier ---" << std::endl;
+                continue;
+            }
             gate.symbol();
             std::cout << std::endl;
         }
@@ -228,8 +247,15 @@ void qs::QuantumCircuit::show() {
         std::cout << " = ";
         this->full_qubit.vector();
         std::cout << std::endl;
-        std::cout << "Full gate:" << std::endl;
-        this->full_gate.matrix();
+        std::cout << "Gates:" << std::endl;
+        for (qs::Unitary &gate : this->gates) {
+            if (gate.dim == 0) {
+                std::cout << "--- barrier ---" << std::endl;
+                continue;
+            }
+            gate.symbol();
+            std::cout << std::endl;
+        }
         std::cout << std::endl;
     }
 }

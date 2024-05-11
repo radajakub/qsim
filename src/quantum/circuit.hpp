@@ -33,8 +33,7 @@ namespace qs {
         bool compiled;
         // tensor product of initial qubits
         Ket full_qubit;
-        // all unitary gates multiplied into one matrix
-        Unitary full_gate;
+        // list of measured qubits
         std::vector<int> measured_qubits;
 
     public:
@@ -42,6 +41,9 @@ namespace qs {
         QuantumCircuit(std::vector<Ket> &qubits, int n_bits);
         QuantumCircuit(int n_qubits, BasicQubits basis = BasicQubits::ZERO) : QuantumCircuit(n_qubits, n_qubits, basis){};
         QuantumCircuit(int n_qubits, int n_bits, BasicQubits basis = BasicQubits::ZERO);
+
+        // insert barrier which is used for printing intermediate results
+        void barrier();
 
         // insert gate for a single qubit
         void gate(Unitary gate, int qubit);
@@ -81,6 +83,12 @@ namespace qs {
     class BalancedOracle : public QuantumCircuit {
     public:
         BalancedOracle(int n_qubits);
+    };
+
+    // implementation of the oracle for Simon's algorithm (inspiration taken from qiskit article)
+    class SimonOracle : public QuantumCircuit {
+    public:
+        SimonOracle(std::string s);
     };
 
     class Outcome {

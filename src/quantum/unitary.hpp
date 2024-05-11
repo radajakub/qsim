@@ -81,6 +81,11 @@ namespace qs {
         Proj(std::vector<qs::BasicQubits> bases);
     };
 
+    class Barrier : public Unitary {
+    public:
+        Barrier() : Unitary(0, {}, std::string("------")){};
+    };
+
 };
 
 #endif
