@@ -186,10 +186,13 @@ qs::Results qs::QuantumCircuit::run(int shots, bool verbose) {
     qs::Ket ket_res = this->full_qubit;
     int n = this->gates.size();
 
+    if (verbose)
+        std::cout << "Steps of the circuit [" << "G is applied gate, Q is state vector in a step" << "]:" << std::endl;
+
     int k = 0;
     for (qs::Unitary &gate : this->gates) {
         if (verbose) {
-            std::cout << "(" << k++ << ") ";
+            std::cout << "$ (" << k++ << ") ";
             if (gate.dim == 0) {
                 std::cout << "Q: ";
                 ket_res.vector();
@@ -234,43 +237,45 @@ qs::Results qs::QuantumCircuit::run(int shots, bool verbose) {
 }
 
 void qs::QuantumCircuit::show() {
+    std::string prefix = "| ";
     if (!this->compiled) {
-        std::cout << "Circuit is not compiled" << std::endl;
-        std::cout << "Qubits:" << std::endl;
+        std::cout << prefix << "" << "Circuit is not compiled" << std::endl;
+        std::cout << prefix << "Qubits:" << std::endl;
         for (qs::Ket &qubit : this->qubits) {
+            std::cout << prefix;
             qubit.symbol();
             std::cout << " = ";
             qubit.vector();
             std::cout << std::endl;
         }
-        std::cout << std::endl;
-        std::cout << "Gates:" << std::endl;
+        std::cout << prefix << std::endl;
+        std::cout << prefix << "Gates:" << std::endl;
         for (qs::Unitary &gate : this->gates) {
             if (gate.dim == 0) {
-                std::cout << "--- barrier ---" << std::endl;
+                std::cout << prefix << "--- barrier ---" << std::endl;
                 continue;
             }
+            std::cout << prefix;
             gate.symbol();
             std::cout << std::endl;
         }
-        std::cout << std::endl;
     } else {
-        std::cout << "Circuit is compiled" << std::endl;
-        std::cout << "Qubit: ";
+        std::cout << prefix << "Circuit is compiled" << std::endl;
+        std::cout << prefix << "Qubit: ";
         this->full_qubit.symbol();
         std::cout << " = ";
         this->full_qubit.vector();
-        std::cout << std::endl;
-        std::cout << "Gates:" << std::endl;
+        std::cout << prefix << std::endl;
+        std::cout << prefix << "Gates:" << std::endl;
         for (qs::Unitary &gate : this->gates) {
             if (gate.dim == 0) {
-                std::cout << "--- barrier ---" << std::endl;
+                std::cout << prefix << "--- barrier ---" << std::endl;
                 continue;
             }
+            std::cout << prefix;
             gate.symbol();
             std::cout << std::endl;
         }
-        std::cout << std::endl;
     }
 }
 

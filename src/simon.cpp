@@ -61,9 +61,16 @@ int main(int argc, char* argv[]) {
     // compile the circuit
     circuit.compile();
 
+    circuit.show();
+    std::cout << std::endl;
+
     // run the circuit
     qs::Results results = circuit.run(shots, verbose);
+    std::cout << std::endl;
+
     results.show_outcomes();
+    std::cout << std::endl;
+
     results.show_counts();
 
     return 0;
